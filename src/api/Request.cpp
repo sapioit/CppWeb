@@ -34,12 +34,6 @@ const std::map<std::string, Http::Request::Method> Http::Request::_methods{
 
 bool Http::Request::operator==(const Http::Request & other)
 {
-    /*Method method;
-        std::string URI;
-        std::string version;
-        Header header;
-        std::string body;
-        int _content_size = 0;*/
     bool bmethod = method == other.method;
     bool buri = URI == other.URI;
     bool bversion = version == other.version;

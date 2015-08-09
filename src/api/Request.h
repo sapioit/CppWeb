@@ -25,6 +25,7 @@ namespace Http {
         std::string body;
         int _content_size = 0;
         static const std::map<std::string, Method> _methods;
+
         enum class Method {
             Delete,
             Get,
@@ -49,6 +50,9 @@ namespace Http {
             Notify,
             Subscribe,
             Unsubscribe
+        };
+        enum class Encoding {
+            ApplicationJson
         };
     };
 }

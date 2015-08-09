@@ -88,11 +88,16 @@ Socket::~Socket() {
 
 std::shared_ptr<Socket> Socket::start_socket(int port, int maxConnections)
 {
-    auto socket = std::make_shared<IO::Socket>(1234);
-    (*socket).Bind();
-    (*socket).MakeNonBlocking();
-    (*socket).Listen(30);
-    return socket;
+    try {
+        auto socket = std::make_shared<IO::Socket>(1234);
+        (*socket).Bind();
+        (*socket).MakeNonBlocking();
+        (*socket).Listen(30);
+        return socket;
+    }
+    catch(std::exception &ex) {
+        throw;
+    }
 }
 
 bool Socket::is_blocking() const {
@@ -102,6 +107,16 @@ bool Socket::is_blocking() const {
 void Socket::Write(const std::string &string) {
     Write(string.data(), string.length());
 }
+
+bool Socket::operator<(const Socket &other)
+{
+    return _reads < other._reads;
+}
+std::uint64_t Socket::getReads() const
+{
+    return _reads;
+}
+
 
 void Socket::Write(const std::vector<char> &vector) {
     Write(vector.data(), vector.size());
@@ -131,14 +146,14 @@ T Socket::Read(std::size_t size) {
     try {
         if (size == 0) {
             auto bytesAvailable = [&]() -> int {
-                int available = -1, errorCode;
-                errorCode = ioctl(_fd, FIONREAD, &available);
-                if (errorCode < 0)
+                    int available = -1, errorCode;
+                    errorCode = ioctl(_fd, FIONREAD, &available);
+                    if (errorCode < 0)
                     throw std::runtime_error(
-                            "Could not determine bytes available on socket with fd = " + std::to_string(_fd) +
-                            ". ioctl failed, errno = " + std::to_string(errno));
-                return available;
-            };
+                        "Could not determine bytes available on socket with fd = " + std::to_string(_fd) +
+                        ". ioctl failed, errno = " + std::to_string(errno));
+                    return available;
+        };
 
             std::size_t available = 0;
             try {
@@ -151,8 +166,9 @@ T Socket::Read(std::size_t size) {
             auto readBytes = ::read(_fd, &result.front(), available);
             if (available != readBytes)
                 throw std::runtime_error("Socket read error on fd = " + std::to_string(_fd) + "."
-                        "Expected to read " + std::to_string(available) + " bytes, but could only read " +
+                                         "Expected to read " + std::to_string(available) + " bytes, but could only read " +
                                          std::to_string(readBytes) + " bytes");
+            ++_reads;
             return result;
         }
         else {
@@ -164,6 +180,7 @@ T Socket::Read(std::size_t size) {
             }
             else if (readBytes != size)
                 result.resize(readBytes);
+            ++_reads;
             return result;
         }
     }
@@ -176,7 +193,7 @@ template std::vector<char> Socket::Read<std::vector<char>>(std::size_t= 0);
 
 template std::string Socket::Read<std::string>(std::size_t= 0);
 
-std::string Socket::ReadUntil(const std::string &until) {
+std::string Socket::ReadUntil(const std::string &until, bool peek) {
     std::string result;
     constexpr std::size_t buffSize = 20;
     std::size_t sum = 0;
@@ -193,6 +210,8 @@ std::string Socket::ReadUntil(const std::string &until) {
         if (position != std::string::npos) {
             position += until.size();
             try {
+                if(peek)
+                    return result.substr(0, position);
                 return Read<std::string>(position);//result.substr(0, position);
             }
             catch (std::runtime_error &ex) {

@@ -18,9 +18,12 @@ namespace IO {
 
         void Stop();
 
-        void Start(std::function<void(std::shared_ptr<Socket>)> callback);
+        void Start(std::function<void(std::shared_ptr<Socket>)>);
+
+        void Start(std::function<void(std::vector<std::shared_ptr<Socket>>)>);
 
         ~Watcher();
+
 
     private:
         static constexpr int _maxEvents = 30;
@@ -29,11 +32,11 @@ namespace IO {
         int _efd;
         std::vector<epoll_event> _events;
         bool _stopRequested = false;
-
-
         std::vector<std::shared_ptr<Socket>> Watch();
-
         void AddSocket(std::shared_ptr<Socket> socket);
+
+        bool stopRequested() const;
+        void setStopRequested(bool stopRequested);
     };
 };
 

@@ -10,11 +10,11 @@
 
 
 namespace Http {
-    class HttpUtility {
-    public:
-        static Request ParseFrom(std::shared_ptr<IO::Socket>);
-
-    };
+class HttpUtility {
+public:
+    static Request ParseFrom(std::shared_ptr<IO::Socket>);
+    static std::string GetURI(const std::string& line);
+};
 };
 
 #endif //SOCKET_HTTPUTILITY_H

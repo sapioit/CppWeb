@@ -34,6 +34,16 @@ Watcher::~Watcher() {
     for (auto &event : _events)
         ::close(event.data.fd);
 }
+bool Watcher::stopRequested() const
+{
+    return _stopRequested;
+}
+
+void Watcher::setStopRequested(bool stopRequested)
+{
+    _stopRequested = stopRequested;
+}
+
 
 std::vector<std::shared_ptr<Socket>> Watcher::Watch() {
     int events_number;
@@ -104,13 +114,29 @@ void Watcher::AddSocket(std::shared_ptr<Socket> socket) {
 
 void Watcher::Start(std::function<void(std::shared_ptr<Socket>)> callback) {
     try {
-        while (!_stopRequested) {
+        while (!stopRequested()) {
             auto sockets_with_activity = Watch();
             for (auto &socket : sockets_with_activity)
+            {
                 callback(socket);
+            }
         }
     }
     catch (std::runtime_error &ex) {
         throw;
     }
 }
+
+void Watcher::Start(std::function<void (std::vector<std::shared_ptr<Socket> >)> callback)
+{
+    try {
+        while(!stopRequested()) {
+            auto sockets_with_activity = Watch();
+            callback(sockets_with_activity);
+        }
+    }
+    catch(std::runtime_error &ex) {
+        throw;
+    }
+}
+

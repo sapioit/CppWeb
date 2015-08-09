@@ -1,7 +1,12 @@
 #include "application.h"
 
-Application::Application()
+Application::Application(const std::string &root) : _root(root)
 {
 
+}
+
+RoutesContainer &Application::route()
+{
+    return _routes;
 }
 
