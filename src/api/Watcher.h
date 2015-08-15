@@ -28,7 +28,7 @@ namespace IO {
 
 
     private:
-        static constexpr int _maxEvents = 30;
+        static constexpr int _maxEvents = 500;
         std::vector<std::shared_ptr<Socket>> _to_observe;
         std::shared_ptr<Socket> _socket;
         int _efd;

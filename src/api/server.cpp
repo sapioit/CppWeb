@@ -12,8 +12,12 @@
 
 using namespace Web;
 
+std::mutex Log::mLock;
+std::string Log::_fn;
 Server::Server(int port) : _port(port)
 {
+    Log::Init("log_file.txt");
+    Log::i("Started logging");
 }
 
 
@@ -34,7 +38,10 @@ void Server::run()
         });
     }
     catch(std::exception& ex) {
-            throw;
+        Log::e(std::string("Server error: ").append(ex.what()));
+        auto msg = std::string("Server error. Please see the log file. Last exception: ");
+        msg += ex.what();
+        throw std::runtime_error(msg);
     }
 }
 int Server::maxPending() const

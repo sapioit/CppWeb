@@ -7,7 +7,7 @@
 #include <assert.h>
 #include <iostream>
 #include <string.h>
-
+#include "log.h"
 
 using namespace IO;
 
@@ -24,17 +24,19 @@ void Watcher::Close(std::shared_ptr<Socket> sock)
             break;
         }
     }
-    auto result = epoll_ctl(_efd, EPOLL_CTL_ADD, (*sock).get_fd(), ev);
+    auto result = epoll_ctl(_efd, EPOLL_CTL_DEL, (*sock).get_fd(), ev);
 
     if(result == 0)
     {
-        //success
+        //Log::i("closed event on fd = " + std::to_string(ev->data.fd));
     }
 
     for(int index = 0; index < _to_observe.size(); ++index) {
         if((*_to_observe[index]).get_fd() == (*sock).get_fd())
         {
             _to_observe.erase(_to_observe.begin() + index);
+            //Log::i("closed socket with fd = " + std::to_string((*sock).get_fd()));
+            break;
         }
     }
 }
@@ -85,7 +87,7 @@ std::vector<std::shared_ptr<Socket>> Watcher::Watch() {
             assert(!(_events[index].events & EPOLLERR));
             assert(!(_events[index].events & EPOLLHUP));
             assert((_events[index].events & EPOLLIN));*/
-            //TODO log
+            Log::e("EPOLLERR, EPOLLHUP, or EPOLLIN received, errno = " + std::to_string(errno));
             ::close(_events[index].data.fd);
             _to_observe.erase(_to_observe.begin() + index);
             continue;
@@ -103,6 +105,7 @@ std::vector<std::shared_ptr<Socket>> Watcher::Watch() {
                 }
             }
             catch (std::exception &ex) {
+                Log::e(ex.what());
                 throw;
             }
         }
@@ -115,7 +118,6 @@ std::vector<std::shared_ptr<Socket>> Watcher::Watch() {
         });
             if (connection_it != _to_observe.end()) {
                 result.push_back(std::shared_ptr<Socket>(*connection_it));
-                //std::cout << "received something on socket with fd = " << (*connection_it)->get_fd() << std::endl;
             }
             else
                 throw std::runtime_error("Error when polling. An inactive socket was marked as active.");

@@ -4,6 +4,7 @@
 #include "Parser.h"
 #include "routeutility.h"
 #include "global.h"
+#include "log.h"
 #include "responsemanager.h"
 
 std::map<std::string, std::function<Http::Response(Http::Request)>> Web::Dispatcher::routes;
@@ -12,21 +13,24 @@ using namespace Web;
 
 void Dispatcher::Dispatch(IO::Socket& connection)
 {
-    //for(auto &connection : connections) {
-    auto &&request = Http::Parser(connection)();
-    if(request.IsPassable()) {
-        auto handler = RouteUtility::GetHandler(request, routes);
-        if(handler) {
-            PassToUser(request, handler, connection);
+    try {
+        auto &&request = Http::Parser(connection)();
+        if(request.IsPassable()) {
+            auto handler = RouteUtility::GetHandler(request, routes);
+            if(handler) {
+                PassToUser(request, handler, connection);
+            }
+            else {
+                //No handler defined. what to do?
+            }
         }
         else {
-            //No handler defined. what to do?
-        }
+            //not passable
+        }}
+    catch(std::runtime_error &ex) {
+        Log::e(ex.what());
     }
-    else {
-        //not passable
-    }
-    //}
+
 }
 
 void Dispatcher::PassToUser(Http::Request request, std::function<Http::Response(Http::Request)> user_handler, IO::Socket& socket)

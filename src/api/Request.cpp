@@ -53,6 +53,8 @@ bool Http::Request::IsPassable() const
         return true;
     case Method::Delete:
         return true;
+    case Method::Head:
+        return true;
     default:
         return false;
     }

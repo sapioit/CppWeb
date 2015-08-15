@@ -6,6 +6,7 @@
 #include <sys/fcntl.h>
 #include <sys/ioctl.h>
 #include <system_error>
+#include "log.h"
 #include <assert.h>
 
 using namespace IO;
@@ -141,8 +142,9 @@ void Socket::Write(const char *data, size_t size) {
     while (sum < size) {
         long bytesWritten = ::write(_fd, data + sum, size);
         if (bytesWritten == -1) {
-            if (!(((errno == EAGAIN) || (errno == EWOULDBLOCK)) && _blocking))
+            if (!(((errno == EAGAIN) || (errno == EWOULDBLOCK)) && _blocking)) {
                 throw std::runtime_error("Error when writing to socket, errno = " + std::to_string(errno));
+            }
         }
         else
             sum += bytesWritten;

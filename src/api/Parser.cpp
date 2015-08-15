@@ -3,7 +3,7 @@
 //
 
 #include "Parser.h"
-
+#include "log.h"
 using namespace Http;
 constexpr auto space = ' ';
 constexpr auto token = ':';
@@ -48,9 +48,15 @@ std::string Parser::GetURI(const std::string &line)
 
 Request Parser::operator()()
 {
-    auto request = Init();
-    request.header = std::move(GetHeader());
-    return request;
+    try {
+        auto request = Init();
+        request.header = std::move(GetHeader());
+        return request;
+    }
+    catch(std::runtime_error &ex) {
+        Log::e(ex.what());
+        throw std::runtime_error("Could not parse request");
+    }
 }
 
 Request Parser::Init() {

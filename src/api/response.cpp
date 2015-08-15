@@ -46,7 +46,7 @@ std::string Response::str() const
     std::ostringstream stream;
     constexpr auto crlf = "\r\n";
 
-    stream << "HTTP/1.1" << " " << code() << "OK" << crlf;
+    stream << "HTTP/1.0" << " " << code() << " OK" << crlf;
     stream << "Date:" << " " << Date::Now()() << crlf;
     stream << "Connection" << " " << "Close" << crlf;
     stream << Http::Header::Fields::Content_Type << ": " << "text/plain; charset=utf-8" << crlf;
