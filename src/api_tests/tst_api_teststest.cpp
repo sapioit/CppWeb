@@ -41,12 +41,17 @@ void Api_testsTest::cleanupTestCase()
 
 void Api_testsTest::ChromeOnce()
 {
+    try {
     Web::Server s(1234);
     Web::Dispatcher::routes.insert(std::make_pair("/adsaf",[](Http::Request req) -> Http::Response {
 
-                                       return 200;
+                                       return {req, 200};
                                    }));
     s.run();
+    }
+    catch(std::exception &ex) {
+        std::cerr << ex.what();
+    }
 }
 
 

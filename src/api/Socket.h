@@ -43,12 +43,15 @@ public:
     bool operator<(const Socket&);
     std::uint64_t getReads() const;
 
+    bool getConnection() const;
+
 private:
     std::uint16_t _port;
     std::uint64_t _reads = 0;
     int _opt = 1, _fd = -1;
     struct sockaddr_in _address;
     bool _blocking = false;
+    bool _connection;
 
 };
 };

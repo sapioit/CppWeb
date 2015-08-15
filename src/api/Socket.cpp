@@ -24,7 +24,7 @@ Socket::Socket(std::uint16_t port) : _port(port) {
     _address.sin_port = htons(port);
 }
 
-Socket::Socket(int fd, bool connection) : _fd(fd) { }
+Socket::Socket(int fd, bool connection) : _fd(fd), _connection(connection) { }
 
 void Socket::Bind() {
     int bind_result = ::bind(_fd, reinterpret_cast<struct sockaddr *>(&_address), sizeof(_address));
@@ -90,10 +90,10 @@ Socket::~Socket() {
 std::shared_ptr<Socket> Socket::start_socket(int port, int maxConnections)
 {
     try {
-        auto socket = std::make_shared<IO::Socket>(1234);
+        auto socket = std::make_shared<IO::Socket>(port);
         (*socket).Bind();
         (*socket).MakeNonBlocking();
-        (*socket).Listen(30);
+        (*socket).Listen(maxConnections);
         return socket;
     }
     catch(std::exception &ex) {
@@ -110,6 +110,7 @@ void Socket::Write(const std::string &string) {
         Write(string.data(), string.length());
     }
     catch(std::runtime_error &ex) {
+        Log::e(ex.what());
         throw;
     }
 }
@@ -129,6 +130,11 @@ std::uint64_t Socket::getReads() const
 {
     return _reads;
 }
+bool Socket::getConnection() const
+{
+    return _connection;
+}
+
 
 
 void Socket::Write(const std::vector<char> &vector) {

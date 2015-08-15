@@ -12,14 +12,14 @@ namespace Web{
 class Server
 {
 public:
-    Server(int);
+    Server(int, int = 1000);
     void run();
 
     int maxPending() const;
     void setMaxPending(int maxPending);
 private:
     int _port = -1;
-    int _maxPending = 500;
+    int _maxPending;
     std::shared_ptr<IO::Socket> _masterSocket;
 };
 };

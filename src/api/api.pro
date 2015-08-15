@@ -19,7 +19,11 @@ SOURCES += \
     responsemanager.cpp \
     routeutility.cpp \
     Parser.cpp \
-    log.cpp
+    log.cpp \
+    storage.cpp \
+    cachemanager.cpp \
+    filesystem.cpp \
+    resource.cpp
 
 SOURCES += \
     DFA.cpp \
@@ -43,7 +47,12 @@ HEADERS += \
     routeutility.h \
     Parser.h \
     date.h \
-    log.h
+    log.h \
+    storage.h \
+    cachemanager.h \
+    filesystem.h \
+    resource.h \
+    components.h
 
 unix {
     target.path = /usr/lib

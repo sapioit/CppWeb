@@ -16,9 +16,9 @@ public:
     Parser(IO::Socket& sock) : _sock(sock) {}
     Request operator()();
     Request Init();
-    Request::Method GetMethod(const std::string& str);
+    Components::Method GetMethod(const std::string& str);
     Header GetHeader();
-    static std::string GetURI(const std::string& line);
+    //static std::string GetURI(const std::string& line);
 };
 };
 

@@ -14,9 +14,11 @@ namespace IO {
     class Watcher {
     public:
         Watcher(std::shared_ptr<Socket>
-                socket);
+                socket, int);
 
         void Stop();
+
+        void Close(int);
 
         void Close(std::shared_ptr<IO::Socket>);
 
@@ -28,7 +30,7 @@ namespace IO {
 
 
     private:
-        static constexpr int _maxEvents = 500;
+        int _maxEvents;
         std::vector<std::shared_ptr<Socket>> _to_observe;
         std::shared_ptr<Socket> _socket;
         int _efd;

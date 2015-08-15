@@ -4,32 +4,10 @@
 
 #include <ostream>
 #include "Request.h"
+#include "components.h"
+#include <regex>
 
-const std::map<std::string, Http::Request::Method> Http::Request::_methods{
-        std::make_pair(std::string("GET"), Http::Request::Method::Get),
-        std::make_pair("POST", Http::Request::Method::Post),
-        std::make_pair("PUT", Http::Request::Method::Put),
-        std::make_pair("DELETE", Http::Request::Method::Delete),
-        std::make_pair("Connect", Http::Request::Method::Connect),
-        std::make_pair("HEAD", Http::Request::Method::Head),
-        std::make_pair("OPTIONS", Http::Request::Method::Options),
-        std::make_pair("TRACE", Http::Request::Method::Trace),
-        std::make_pair("COPY", Http::Request::Method::Copy),
-        std::make_pair("LOCK", Http::Request::Method::Lock),
-        std::make_pair("MKCOL", Http::Request::Method::Mkcol),
-        std::make_pair("MOVE", Http::Request::Method::Move),
-        std::make_pair("PROPFIND", Http::Request::Method::Propfind),
-        std::make_pair("PROPPATCH", Http::Request::Method::Proppatch),
-        std::make_pair("UNLOCK", Http::Request::Method::Unlock),
-        std::make_pair("REPORT", Http::Request::Method::Report),
-        std::make_pair("MKACTIVITY", Http::Request::Method::Mkactivity),
-        std::make_pair("CHECKOUT", Http::Request::Method::Checkout),
-        std::make_pair("MERGE", Http::Request::Method::Merge),
-        std::make_pair("M-SEARCH", Http::Request::Method::M_Search),
-        std::make_pair("NOTIFY", Http::Request::Method::Notify),
-        std::make_pair("SUBSCRIBE", Http::Request::Method::Subscribe),
-        std::make_pair("UNSUBSCRIBE", Http::Request::Method::Unsubscribe)
-};
+using namespace Http;
 
 
 bool Http::Request::operator==(const Http::Request & other)
@@ -45,18 +23,25 @@ bool Http::Request::operator==(const Http::Request & other)
 bool Http::Request::IsPassable() const
 {
     switch(method) {
-    case Method::Get:
+    case Components::Method::Get:
         return true;
-    case Method::Post:
+    case Components::Method::Post:
         return true;
-    case Method::Put:
+    case Components::Method::Put:
         return true;
-    case Method::Delete:
+    case Components::Method::Delete:
         return true;
-    case Method::Head:
+    case Components::Method::Head:
         return true;
     default:
         return false;
     }
+}
+
+bool Http::Request::IsResource() const
+{
+    std::regex extensions(".*\\.(jpg|jpeg|png|gif|zip|pdf)$", std::regex::ECMAScript|std::regex::icase);
+    bool match = std::regex_match(URI, extensions);
+    return match;
 }
 

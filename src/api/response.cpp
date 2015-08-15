@@ -2,26 +2,10 @@
 #include "Request.h"
 #include <json/json.h>
 #include "date.h"
+#include <iomanip>
+#include <iterator>
 using namespace Http;
-Response::Response()
-{
 
-}
-
-Response::Response(int code) : _code(code)
-{
-
-}
-
-Response::Response(const std::string &text) : _code(200), _text(text)
-{
-
-}
-
-Response::Response(int code, const std::string &text) : _code(code), _text(text)
-{
-
-}
 int Response::code() const
 {
     return _code;
@@ -41,32 +25,75 @@ void Response::setContent_type(const Header::MIME_Type &value)
     content_type = value;
 }
 
-std::string Response::str() const
+std::string Response::str()
 {
     std::ostringstream stream;
     constexpr auto crlf = "\r\n";
 
-    stream << "HTTP/1.0" << " " << code() << " OK" << crlf;
+    stream << "HTTP/" << std::setprecision(2) << _request.version << " " << code() << " " << "OK" << crlf;
     stream << "Date:" << " " << Date::Now()() << crlf;
-    stream << "Connection" << " " << "Close" << crlf;
-    stream << Http::Header::Fields::Content_Type << ": " << "text/plain; charset=utf-8" << crlf;
-    stream << Http::Header::Fields::Content_Length << ": " << 2 << crlf;
+    stream << "Connection:" << " " << "Close" << crlf;
+
+    if(_request.IsResource()){
+        stream << Http::Header::Fields::Content_Length << ": " << _resource.content().size()  << crlf;
+        stream << Http::Header::Fields::Content_Type << ": " << "image/jpeg" << crlf;
+        stream << Http::Header::Fields::Cache_Control << ": " << "no-cache" << crlf;
+        stream << Http::Header::Fields::Transfer_Encoding << ": " << "binary" << crlf;
+    }
+    else {
+        stream << Http::Header::Fields::Content_Type << ": " << "text/plain; charset=utf-8" << crlf;
+        stream << Http::Header::Fields::Content_Length << ": " << _text.size()   << crlf;
+    }
 
     stream << crlf;
 
     // START BODY
-
-    stream << "ab" << crlf;
+    if(_request.IsResource()) {
+        std::copy(_resource.content().begin(), _resource.content().end(), std::ostream_iterator<char>(stream));
+        stream << crlf;
+    }
 
     stream << crlf;
 
-    return stream.str();
+    auto response_str = stream.str();
+    return response_str;
+}
+const Resource& Response::getResource() const
+{
+    return _resource;
 }
 
-//std::ostream& operator<<( std::ostream& stream, const Response& response) {
+void Response::setResource(const Resource &resource)
+{
+    _resource = resource;
+}
 
-//    stream << "HTTP/1.1" << " " << response.code() << "OK" << "\r\n";
+Response::Response()
+{
 
+}
 
-//    return stream;
-//}
+Response::Response(const Request &request) : _request(request)
+{
+
+}
+
+Response::Response(const Request& request, int code) : _request(request), _code(code)
+{
+
+}
+
+Response::Response(const Request& request, const std::string &text) : _request(request), _code(200), _text(text)
+{
+
+}
+
+Response::Response(const Request& request, int code, const std::string &text) : _request(request), _code(code), _text(text)
+{
+
+}
+
+Response::Response(const Request& request, const Resource & resource) :_request(request), _resource(resource), _code(200)
+{
+
+}

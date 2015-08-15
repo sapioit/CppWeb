@@ -8,40 +8,11 @@
 #include <iostream>
 #include <string.h>
 #include "log.h"
+#include <sstream>
 
 using namespace IO;
 
-void Watcher::Stop() {
-    _stopRequested = true;
-}
-
-void Watcher::Close(std::shared_ptr<Socket> sock)
-{
-    struct epoll_event *ev = nullptr;
-    for(auto& event : _events) {
-        if(event.data.fd==(*sock).get_fd()) {
-            ev = &event;
-            break;
-        }
-    }
-    auto result = epoll_ctl(_efd, EPOLL_CTL_DEL, (*sock).get_fd(), ev);
-
-    if(result == 0)
-    {
-        //Log::i("closed event on fd = " + std::to_string(ev->data.fd));
-    }
-
-    for(int index = 0; index < _to_observe.size(); ++index) {
-        if((*_to_observe[index]).get_fd() == (*sock).get_fd())
-        {
-            _to_observe.erase(_to_observe.begin() + index);
-            //Log::i("closed socket with fd = " + std::to_string((*sock).get_fd()));
-            break;
-        }
-    }
-}
-
-Watcher::Watcher(std::shared_ptr<Socket> socket) : _socket(socket) {
+Watcher::Watcher(std::shared_ptr<Socket> socket, int maxEvents) : _socket(socket), _maxEvents(maxEvents) {
     _efd = epoll_create1(0);
     if (_efd == -1) {
         throw std::runtime_error("Epoll create failed");
@@ -55,6 +26,43 @@ Watcher::Watcher(std::shared_ptr<Socket> socket) : _socket(socket) {
 
     _events.resize(_maxEvents);
 }
+
+void Watcher::Stop() {
+    _stopRequested = true;
+}
+
+void Watcher::Close(int fd) {
+    struct epoll_event *ev = nullptr;
+    for(auto& event : _events) {
+        if(event.data.fd==fd) {
+            ev = &event;
+            break;
+        }
+    }
+    auto result = epoll_ctl(_efd, EPOLL_CTL_DEL, fd, ev);
+
+    if(result == 0)
+    {
+        Log::i("closed event on fd = " + std::to_string(ev->data.fd));
+    }
+
+    for(std::size_t index = 0; index < _to_observe.size(); ++index) {
+        if((*_to_observe[index]).get_fd() == fd)
+        {
+            _to_observe.erase(_to_observe.begin() + index);
+            Log::i("closed socket with fd = " + std::to_string(fd));
+            break;
+        }
+    }
+    Log::i("sockets left to observe: " + std::to_string(_to_observe.size()));
+    Log::i("events left in the vector: " + std::to_string(_events.size()) + "\n");
+}
+
+void Watcher::Close(std::shared_ptr<Socket> sock)
+{
+    Watcher::Close((*sock).get_fd());
+}
+
 
 Watcher::~Watcher() {
     for (auto &event : _events)
@@ -74,34 +82,60 @@ void Watcher::setStopRequested(bool stopRequested)
 std::vector<std::shared_ptr<Socket>> Watcher::Watch() {
     int events_number;
     std::vector<std::shared_ptr<Socket>> result;
+    _events.resize(_maxEvents);
     do {
-        //std::cout << "will call epoll_wait on _efd = " << _efd << std::endl;
         events_number = epoll_wait(_efd, _events.data(), _maxEvents, -1);
         if (events_number == -1 && errno != EINTR)
             throw std::runtime_error("Epoll wait error, errno = " + std::to_string(errno));
     }
     while (events_number == -1);
+    _events.resize(events_number);
     for (int index = 0; index < events_number; ++index) {
-        if ((_events[index].events & EPOLLERR) || (_events[index].events & EPOLLHUP) ||
-                (!(_events[index].events & EPOLLIN))) {/*
-            assert(!(_events[index].events & EPOLLERR));
-            assert(!(_events[index].events & EPOLLHUP));
-            assert((_events[index].events & EPOLLIN));*/
-            Log::e("EPOLLERR, EPOLLHUP, or EPOLLIN received, errno = " + std::to_string(errno));
+        Log::i("got " + std::to_string(events_number) + " events");
+        if ((_events[index].events & EPOLLERR) ||
+            (_events[index].events & EPOLLHUP) ||
+            (!(_events[index].events & EPOLLIN))) {
+            std::ostringstream error;
+
+//            bool epollerr = (_events[index].events & EPOLLERR) != 0;
+//            bool epollhup = (_events[index].events & EPOLLHUP) != 0;
+//            bool epollin = (_events[index].events & EPOLLIN) != 0;
+//            if(epollerr) error << "EPOLERR ";
+//            if(epollhup) error << "EPOLLHUP ";
+//            if(epollin) error << "EPOLLIN ";
+//            error << "received. errno = " << std::to_string(errno);
+
+            int ierror = 0;
+            socklen_t errlen = sizeof(ierror);
+            if (!getsockopt(_efd, SOL_SOCKET, SO_ERROR, (void *)&ierror, &errlen) == 0)
+            {
+                error << "getsockopt SO_ERROR = " << ierror << " strerror: " << strerror(ierror);
+            }
+
+
+            Log::e(error.str());
             ::close(_events[index].data.fd);
+            ::close((*_to_observe[index]).get_fd());
             _to_observe.erase(_to_observe.begin() + index);
             continue;
         }
+
+        if(_events[index].events & EPOLLRDHUP)
+            Close(_events[index].data.fd);
+
         if ((*_socket).get_fd() == _events[index].data.fd) {
             /* the listening socket received something,
              * that means we'll accept a new connection */
             try {
                 while (true) {
                     auto new_connection = (*_socket).Accept();
-                    if ((*new_connection).get_fd() == -1) // done accepting
+                    if ((*new_connection).get_fd() == -1)  {
+                        Log::e("error on accepting, errno = " + std::to_string(errno));
                         break;
+                    }
                     (*new_connection).MakeNonBlocking();
                     AddSocket(new_connection);
+                    Log::i("added new socket with fd = " + std::to_string((*new_connection).get_fd()));
                 }
             }
             catch (std::exception &ex) {

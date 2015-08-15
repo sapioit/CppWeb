@@ -7,54 +7,26 @@
 
 #include "Header.h"
 #include "Socket.h"
+#include <components.h>
 #include <string>
 #include <map>
 
 namespace Http {
+
     class Request {
     public:
-        enum class Method;
-        Method method;
+        Components::Method method;
         Header header;
-        std::string URI, version, body;
-
-        static const std::map<std::string, Method> _methods;
-
+        std::string URI, body;
+        float version;
         Request() = default;
         Request(const Request&) = default;
         Request(Request&&) = default;
         Request& operator=(const Request&) = default;
         bool operator==(const Request&);
         bool IsPassable() const;
+        bool IsResource() const;
 
-        enum class Method {
-            Delete,
-            Get,
-            Head,
-            Post,
-            Put,
-            Connect,
-            Options,
-            Trace,
-            Copy,
-            Lock,
-            Mkcol,
-            Move,
-            Propfind,
-            Proppatch,
-            Unlock,
-            Report,
-            Mkactivity,
-            Checkout,
-            Merge,
-            M_Search,
-            Notify,
-            Subscribe,
-            Unsubscribe
-        };
-        enum class Encoding {
-            ApplicationJson
-        };
     };
 }
 
