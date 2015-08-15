@@ -11,7 +11,7 @@ QT       -= gui
 TARGET = tst_api_teststest
 CONFIG   += console
 CONFIG   -= app_bundle
-CONFIG += c++11
+CONFIG += c++14
 
 TEMPLATE = app
 

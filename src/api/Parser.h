@@ -10,9 +10,14 @@
 
 
 namespace Http {
-class HttpUtility {
+class Parser {
+    IO::Socket& _sock;
 public:
-    static Request ParseFrom(std::shared_ptr<IO::Socket>);
+    Parser(IO::Socket& sock) : _sock(sock) {}
+    Request operator()();
+    Request Init();
+    Request::Method GetMethod(const std::string& str);
+    Header GetHeader();
     static std::string GetURI(const std::string& line);
 };
 };

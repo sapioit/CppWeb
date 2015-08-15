@@ -18,6 +18,8 @@ namespace IO {
 
         void Stop();
 
+        void Close(std::shared_ptr<IO::Socket>);
+
         void Start(std::function<void(std::shared_ptr<Socket>)>);
 
         void Start(std::function<void(std::vector<std::shared_ptr<Socket>>)>);

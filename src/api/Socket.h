@@ -38,6 +38,7 @@ public:
     void Write(const char *, std::size_t);
     void Write(const std::vector<char> &);
     void Write(const std::string &);
+    bool WasShutDown();
 
     bool operator<(const Socket&);
     std::uint64_t getReads() const;

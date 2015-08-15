@@ -3,15 +3,14 @@
 
 #include <vector>
 #include <memory>
+#include <experimental/optional>
 #include "Socket.h"
-#include "application.h"
 
 namespace Web{
 class Server
 {
 public:
     Server(int);
-    void add(std::shared_ptr<Application>);
     void run();
 
     int maxPending() const;
@@ -20,7 +19,6 @@ public:
 private:
     int _port = -1;
     int _maxPending = 100;
-    std::vector<std::shared_ptr<Application>> _applications;
     std::shared_ptr<IO::Socket> _masterSocket;
 };
 };

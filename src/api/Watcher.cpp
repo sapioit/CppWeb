@@ -15,6 +15,30 @@ void Watcher::Stop() {
     _stopRequested = true;
 }
 
+void Watcher::Close(std::shared_ptr<Socket> sock)
+{
+    struct epoll_event *ev = nullptr;
+    for(auto& event : _events) {
+        if(event.data.fd==(*sock).get_fd()) {
+            ev = &event;
+            break;
+        }
+    }
+    auto result = epoll_ctl(_efd, EPOLL_CTL_ADD, (*sock).get_fd(), ev);
+
+    if(result == 0)
+    {
+        //success
+    }
+
+    for(int index = 0; index < _to_observe.size(); ++index) {
+        if((*_to_observe[index]).get_fd() == (*sock).get_fd())
+        {
+            _to_observe.erase(_to_observe.begin() + index);
+        }
+    }
+}
+
 Watcher::Watcher(std::shared_ptr<Socket> socket) : _socket(socket) {
     _efd = epoll_create1(0);
     if (_efd == -1) {
@@ -27,7 +51,7 @@ Watcher::Watcher(std::shared_ptr<Socket> socket) : _socket(socket) {
         throw;
     }
 
-    _events.resize(_maxEvents); //static_cast<epoll_event*>(calloc(_maxEvents, sizeof(_event)));
+    _events.resize(_maxEvents);
 }
 
 Watcher::~Watcher() {
@@ -57,10 +81,11 @@ std::vector<std::shared_ptr<Socket>> Watcher::Watch() {
     while (events_number == -1);
     for (int index = 0; index < events_number; ++index) {
         if ((_events[index].events & EPOLLERR) || (_events[index].events & EPOLLHUP) ||
-            (!(_events[index].events & EPOLLIN))) {
+                (!(_events[index].events & EPOLLIN))) {/*
             assert(!(_events[index].events & EPOLLERR));
             assert(!(_events[index].events & EPOLLHUP));
-            assert((_events[index].events & EPOLLIN));
+            assert((_events[index].events & EPOLLIN));*/
+            //TODO log
             ::close(_events[index].data.fd);
             _to_observe.erase(_to_observe.begin() + index);
             continue;
@@ -86,8 +111,8 @@ std::vector<std::shared_ptr<Socket>> Watcher::Watch() {
              * to the list of active socekts */
             auto connection_it = std::find_if(_to_observe.begin(), _to_observe.end(),
                                               [&](std::shared_ptr<Socket> ptr) {
-                                                  return (*ptr).get_fd() == _events[index].data.fd;
-                                              });
+                    return (*ptr).get_fd() == _events[index].data.fd;
+        });
             if (connection_it != _to_observe.end()) {
                 result.push_back(std::shared_ptr<Socket>(*connection_it));
                 //std::cout << "received something on socket with fd = " << (*connection_it)->get_fd() << std::endl;
@@ -132,7 +157,9 @@ void Watcher::Start(std::function<void (std::vector<std::shared_ptr<Socket> >)> 
     try {
         while(!stopRequested()) {
             auto sockets_with_activity = Watch();
-            callback(sockets_with_activity);
+            if(sockets_with_activity.size() > 0) {
+                callback(sockets_with_activity);
+            }
         }
     }
     catch(std::runtime_error &ex) {

@@ -3,16 +3,18 @@
 
 #include <map>
 #include <memory>
-#include "application.h"
 #include "Socket.h"
+#include "routeutility.h"
+#include <functional>
 #define USE_GLOBAL_DEFINES
 #include "global.h"
 namespace Web {
 class Dispatcher
 {
 public:
-    static void Dispatch(std::map<std::shared_ptr<Application>, std::vector<std::shared_ptr<IO::Socket>>>);
-    static void PassToUser(Http::Request, std::function<Http::Response(Http::Request)>, std::shared_ptr<IO::Socket>);
+    static std::map<std::string, std::function<Http::Response(Http::Request)>> routes;
+    static void Dispatch(IO::Socket &connection);
+    static void PassToUser(Http::Request request, std::function<Http::Response(Http::Request)> user_handler, IO::Socket &socket);
 };
 }
 

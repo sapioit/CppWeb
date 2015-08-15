@@ -11,20 +11,21 @@
 #include <map>
 
 namespace Http {
-    struct Request {
+    class Request {
+    public:
+        enum class Method;
+        Method method;
+        Header header;
+        std::string URI, version, body;
+
+        static const std::map<std::string, Method> _methods;
+
         Request() = default;
         Request(const Request&) = default;
         Request(Request&&) = default;
         Request& operator=(const Request&) = default;
         bool operator==(const Request&);
-        enum class Method;
-        Method method;
-        std::string URI;
-        std::string version;
-        Header header;
-        std::string body;
-        int _content_size = 0;
-        static const std::map<std::string, Method> _methods;
+        bool IsPassable() const;
 
         enum class Method {
             Delete,

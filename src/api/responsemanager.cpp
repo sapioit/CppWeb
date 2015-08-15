@@ -1,7 +1,7 @@
 #include "responsemanager.h"
 #include <sstream>
 
-void ResponseManager::Respond(const Http::Request& request, Http::Response response, std::shared_ptr<IO::Socket> socket)
+void ResponseManager::Respond(const Http::Request& request, Http::Response response, IO::Socket& socket)
 {
     /*TODO:
      * determine response type
@@ -9,8 +9,11 @@ void ResponseManager::Respond(const Http::Request& request, Http::Response respo
      * write to socket
      */
 
-    std::ostringstream stream;
-    stream << response;
-    std::string raw_response = stream.str();
-    (*socket).Write(std::move(raw_response));
+    auto raw_response = response.str();
+    try {
+        socket.Write(std::move(raw_response));
+    }
+    catch(std::runtime_error &ex) {
+        //log
+    }
 }

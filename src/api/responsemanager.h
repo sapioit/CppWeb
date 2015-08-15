@@ -8,7 +8,7 @@
 class ResponseManager
 {
 public:
-    static void Respond(const Http::Request&, Http::Response, std::shared_ptr<IO::Socket>);
+    static void Respond(const Http::Request&, Http::Response, IO::Socket &);
 };
 
 #endif // RESPONSEMANAGER_H

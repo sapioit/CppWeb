@@ -2,14 +2,15 @@
 #define ROUTESMANAGER_H
 
 #include "Request.h"
-#include "routescontainer.h"
+#include "response.h"
+#include "global.h"
+#include <map>
 
 
-class RoutesManager
+class RouteUtility
 {
 public:
-    static bool IsPassable(const Http::Request& request);
-    static std::function<Http::Response(Http::Request)> GetHandler(const Http::Request& request, const RoutesContainer &routes);
+    static std::function<Http::Response(Http::Request)> GetHandler(const Http::Request& request, const std::map<std::string, std::function<Http::Response(Http::Request)>> &routes);
 };
 
 #endif // ROUTESMANAGER_H

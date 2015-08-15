@@ -18,13 +18,15 @@ namespace Http {
         bool operator==(const Header& other) { return fields == other.fields; }
         Header& operator=(const Header&) = default;
         ~Header() = default;
-        std::map<std::string, std::string> fields;
-        enum class MIME_Type;
-        MIME_Type mime_type;
-        std::vector<MIME_Type> accepted;
+
         enum class MIME_Type {
             ApplicationJson
         };
+
+        MIME_Type mime_type;
+        std::vector<MIME_Type> accepted;
+
+        std::map<std::string, std::string> fields;
 
         //Common
         struct Fields {

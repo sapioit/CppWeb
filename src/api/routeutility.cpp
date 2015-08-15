@@ -1,13 +1,25 @@
-#include "routesmanager.h"
+#include "routeutility.h"
+#include <algorithm>
+#include <regex>
 
-bool RoutesManager::IsPassable(const Http::Request &request)
-{
-    //TODO check the method of the request, if it's GET, POST, PUT, DELETE, etc, it is passable
-    return true;
-}
 
-std::function<Http::Response (Http::Request)> RoutesManager::GetHandler(const Http::Request &request, const RoutesContainer &routes)
+std::function<Http::Response (Http::Request)> RouteUtility::GetHandler(const Http::Request &request, const std::map<std::string, std::function<Http::Response (Http::Request)>> &routes)
 {
-    //TODO try to apply all the regular expression in the routes container on the request URI
+    auto result = std::find_if(routes.begin(), routes.end(), [&](const std::pair<std::string, std::function<Http::Response(Http::Request)>>& route) -> bool {
+//        std::regex reg(route.first);
+//        auto begin = std::sregex_iterator(request.URI.begin(), request.URI.end(), reg);
+//        auto end = std::sregex_iterator();
+
+//        if(std::distance(begin, end) == 0)
+//            return false;
+        if(route.first == request.URI)
+            return true;
+        return false;
+    });
+
+    if(result != routes.end()) {
+        return result->second;
+    }
+
     return nullptr;
 }

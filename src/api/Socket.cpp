@@ -105,7 +105,19 @@ bool Socket::is_blocking() const {
 }
 
 void Socket::Write(const std::string &string) {
-    Write(string.data(), string.length());
+    try {
+        Write(string.data(), string.length());
+    }
+    catch(std::runtime_error &ex) {
+        throw;
+    }
+}
+
+bool Socket::WasShutDown()
+{
+    char a;
+    auto bytesRead = ::recv(_fd, &a, 1, MSG_PEEK);
+    return bytesRead == 0;
 }
 
 bool Socket::operator<(const Socket &other)
@@ -124,12 +136,12 @@ void Socket::Write(const std::vector<char> &vector) {
 
 
 void Socket::Write(const char *data, size_t size) {
-    long sum = 0;
+    size_t sum = 0;
 
     while (sum < size) {
         long bytesWritten = ::write(_fd, data + sum, size);
         if (bytesWritten == -1) {
-            if (!((errno == EAGAIN) || (errno == EWOULDBLOCK) && _blocking))
+            if (!(((errno == EAGAIN) || (errno == EWOULDBLOCK)) && _blocking))
                 throw std::runtime_error("Error when writing to socket, errno = " + std::to_string(errno));
         }
         else
@@ -155,7 +167,7 @@ T Socket::Read(std::size_t size) {
                     return available;
         };
 
-            std::size_t available = 0;
+            ssize_t available = 0;
             try {
                 available = static_cast<std::size_t>(bytesAvailable());
             }
@@ -163,7 +175,7 @@ T Socket::Read(std::size_t size) {
                 throw;
             }
             result.resize(available);
-            auto readBytes = ::read(_fd, &result.front(), available);
+            ssize_t readBytes = ::read(_fd, &result.front(), available);
             if (available != readBytes)
                 throw std::runtime_error("Socket read error on fd = " + std::to_string(_fd) + "."
                                          "Expected to read " + std::to_string(available) + " bytes, but could only read " +
@@ -175,10 +187,10 @@ T Socket::Read(std::size_t size) {
             result.resize(size);
             auto readBytes = ::read(_fd, &result.front(), size);
             if (readBytes == -1) {
-                if (!((errno == EAGAIN) || (errno == EWOULDBLOCK) && _blocking))
+                if (!(((errno == EAGAIN) || (errno == EWOULDBLOCK)) && _blocking))
                     throw std::runtime_error("Error when reading from socket, errno = " + std::to_string(errno));
             }
-            else if (readBytes != size)
+            else if (static_cast<std::size_t>(readBytes) != size)
                 result.resize(readBytes);
             ++_reads;
             return result;
@@ -201,7 +213,7 @@ std::string Socket::ReadUntil(const std::string &until, bool peek) {
         result.resize(sum + buffSize);
         auto bytesRead = ::recv(_fd, &result.front(), buffSize + sum, MSG_PEEK);
         if (bytesRead == -1) {
-            if (!((errno == EAGAIN) || (errno == EWOULDBLOCK) && _blocking))
+            if (!(((errno == EAGAIN) || (errno == EWOULDBLOCK)) && _blocking))
                 throw std::runtime_error("Error when reading from socket, errno = " + std::to_string(errno));
             else
                 return "";

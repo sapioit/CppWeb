@@ -1,7 +1,7 @@
 #include "Socket.h"
 #include "Watcher.h"
 #include "Request.h"
-#include "HttpUtility.h"
+#include "Parser.h"
 #include <iostream>
 
 int main() {
@@ -13,7 +13,7 @@ int main() {
         IO::Watcher watcher(socket);
         watcher.Start([](std::shared_ptr<IO::Socket> sock) {
             try {
-                auto req = std::move(Http::HttpUtility::ParseFrom(sock));
+                auto &&req = Http::Parser((*sock))();
                 std::cout << "got request" << std::endl;
 
             }

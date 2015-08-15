@@ -42,3 +42,19 @@ bool Http::Request::operator==(const Http::Request & other)
     return (bmethod && buri && bversion && bheader && bbody);
 }
 
+bool Http::Request::IsPassable() const
+{
+    switch(method) {
+    case Method::Get:
+        return true;
+    case Method::Post:
+        return true;
+    case Method::Put:
+        return true;
+    case Method::Delete:
+        return true;
+    default:
+        return false;
+    }
+}
+
