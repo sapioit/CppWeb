@@ -11,42 +11,14 @@ constexpr auto space = ' ';
 constexpr auto token = ':';
 constexpr auto CRLF = "\r\n";
 
-std::vector<Header::MIME_Type> GetAcceptedEncodings(const std::string& line){
-    return std::vector<Header::MIME_Type>();
+std::vector<Components::ContentType> GetAcceptedEncodings(const std::string& line){
+    return std::vector<Components::ContentType>();
 }
 
-Header::MIME_Type GetMimeType(const std::string& line) {
+Components::ContentType GetMimeType(const std::string& line) {
     //TODO parse line and get it
-    return Header::MIME_Type::ApplicationJson;
+    return Components::ContentType::ApplicationJson;
 }
-
-//std::string Parser::GetURI(const std::string &line)
-//{
-//    if (line == "")
-//        return "";
-
-//    auto get_method = [](const std::string &str) -> Components::Method {
-//        auto method = Http::Components::methods.find(str);
-//        if (method == Http::Components::methods.end())
-//            throw std::runtime_error("Method not found");
-//        return method->second;
-//    };
-
-//    Request request;
-//    auto first_space = line.find(space);
-//    try {
-//        request.method = get_method(std::string(line.begin(), line.begin() + first_space));
-//    }
-//    catch (std::runtime_error &ex) {
-//        throw;
-//    }
-
-//    auto _URI_begin = line.find_first_not_of(space, first_space);
-//    auto _URI_end = line.find_first_of(space, _URI_begin + 1);
-
-//    return std::string(line.begin() + _URI_begin, line.begin() + _URI_end);
-//}
-
 
 Request Parser::operator()()
 {
@@ -77,25 +49,13 @@ Request Parser::Init() {
     try {
         auto _URI_begin = line.find_first_not_of(space, first_space);
         auto _URI_end = line.find_first_of(space, _URI_begin + 1);
-
         auto _version_begin = line.find_first_not_of(space, _URI_end);
         auto _version_end = line.find_first_of("\r\n", _version_begin + 1);
-
-        //    auto _CRLF_begin = line.find_first_of('\r', _version_end);
-        //    auto _CRLF_end = line.find_first_of('\n', _CRLF_begin + 1);
-
         request.URI = std::string(line.begin() + _URI_begin, line.begin() + _URI_end);
-        //request.version = std::string(line.begin() + _version_begin, line.begin() + _version_end);
         std::string http_version_str(line.begin() + _version_begin, line.begin() + _version_end);
-
         auto dot = http_version_str.find('.');
-
         std::string version(http_version_str.begin() + dot -1, http_version_str.end());
-
         float version_f = std::stof(version);
-
-        //assert(version == std::to_string(version_f));
-
         request.version = version_f;
         return request;
     }

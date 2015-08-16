@@ -22,7 +22,7 @@ public:
     bool operator <(const Resource&);
 
     const std::uint64_t& hits() const;
-    const std::vector<char>& content();
+    const std::vector<char>& content() const;
     const std::string& path() const;
 };
 

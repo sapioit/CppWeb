@@ -31,15 +31,10 @@ void Server::run()
         _masterSocket = IO::Socket::start_socket(_port, _maxPending);
         IO::Watcher _master_listener(_masterSocket, _maxPending);
         _master_listener.Start([&](std::vector<std::shared_ptr<IO::Socket>> sockets) {
-            std::vector<std::future<bool>> futures;
             for(auto& sock: sockets) {
-//                if((*sock).WasShutDown())
-//                    _master_listener.Close(sock);
-//                else {
                     bool should_close = Dispatcher::Dispatch((*sock));
                     if(should_close)
                         _master_listener.Close(sock);
-//                }
             }
         });
     }

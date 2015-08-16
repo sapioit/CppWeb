@@ -14,6 +14,7 @@
 namespace Http {
 
     class Request {
+        std::vector<Components::ContentType> _accepted;
     public:
         Components::Method method;
         Header header;
@@ -27,6 +28,8 @@ namespace Http {
         bool IsPassable() const;
         bool IsResource() const;
 
+        const std::vector<Components::ContentType>& accepted() const;
+        void setAccepted(const std::vector<Components::ContentType> &accepted);
     };
 }
 

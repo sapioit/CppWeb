@@ -13,26 +13,17 @@
 namespace IO {
     class Watcher {
     public:
-        Watcher(std::shared_ptr<Socket>
-                socket, int);
-
-        void Stop();
-
-        void Close(int);
-
-        void Close(std::shared_ptr<IO::Socket>);
-
-        void Start(std::function<void(std::shared_ptr<Socket>)>);
-
-        void Start(std::function<void(std::vector<std::shared_ptr<Socket>>)>);
-
+        Watcher(std::shared_ptr<Socket>, int);
         ~Watcher();
-
-
+        void Stop();
+        void Close(int);
+        void Close(std::shared_ptr<IO::Socket>);
+        void Start(std::function<void(std::shared_ptr<Socket>)>);
+        void Start(std::function<void(std::vector<std::shared_ptr<Socket>>)>);
     private:
+        std::shared_ptr<Socket> _socket;
         int _maxEvents;
         std::vector<std::shared_ptr<Socket>> _to_observe;
-        std::shared_ptr<Socket> _socket;
         int _efd;
         std::vector<epoll_event> _events;
         bool _stopRequested = false;

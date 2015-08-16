@@ -30,7 +30,7 @@ enum class Method {
     Unsubscribe
 };
 
-const std::map<std::string, Method> methods{
+const std::map<const std::string, const Method> methods{
     std::make_pair("GET", Method::Get),
             std::make_pair("POST", Method::Post),
             std::make_pair("PUT", Method::Put),
@@ -56,10 +56,39 @@ const std::map<std::string, Method> methods{
             std::make_pair("UNSUBSCRIBE", Method::Unsubscribe)
 };
 
-enum class Encoding {
+enum class ContentType {
     ApplicationJson,
-    TextPlain
+    TextPlain,
+    TextHtml,
+    ImageJpeg,
+    ImagePng
 };
+
+const std::map<const ContentType, const std::string> content_types {
+    std::make_pair(ContentType::ApplicationJson, "application/json"),
+            std::make_pair(ContentType::TextPlain, "text/plain"),
+            std::make_pair(ContentType::TextHtml, "text/html"),
+            std::make_pair(ContentType::ImageJpeg, "image/jpeg"),
+            std::make_pair(ContentType::ImagePng, "image/png")
+
+};
+
+enum class StatusCode {
+    OK = 200,
+    BadRequest = 400,
+    NotFound = 404,
+    UnsupportedMediaType = 415,
+    InternalServerError = 500
+};
+
+const std::map<const StatusCode, const std::string> status_codes {
+    std::make_pair(StatusCode::OK, "OK"),
+            std::make_pair(StatusCode::BadRequest, "Bad Request"),
+            std::make_pair(StatusCode::NotFound, "Not Found"),
+            std::make_pair(StatusCode::UnsupportedMediaType, "Unsupported Media Type"),
+            std::make_pair(StatusCode::InternalServerError, "Internal Server Error")
+};
+
 }
 }
 #endif // COMPONENTS

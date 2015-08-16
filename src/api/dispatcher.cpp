@@ -7,6 +7,7 @@
 #include "log.h"
 #include "responsemanager.h"
 #include "storage.h"
+#include "components.h"
 
 std::map<std::string, std::function<Http::Response(Http::Request)>> Web::Dispatcher::routes;
 
@@ -20,12 +21,14 @@ bool Dispatcher::Dispatch(IO::Socket& connection)
             if(!request.IsResource()) {
                 auto handler = RouteUtility::GetHandler(request, routes);
                 if(handler) {
-                    PassToUser(request, handler, connection);
-                    return false;
+                    //PassToUser(request, handler, connection);
+                    auto response = handler(request);
+                    ResponseManager::Respond(response, connection);
+                    return response.should_close();
                 }
                 else {
                     // no user-defined handler, return not found
-                    ResponseManager::Respond(request, {request, 404}, connection);
+                    ResponseManager::Respond({request, 404}, connection);
                     return true;
                 }
             }
@@ -34,11 +37,13 @@ bool Dispatcher::Dispatch(IO::Socket& connection)
                 try {
                     auto &&resource = Storage::GetResource(request.URI.c_str());
                     Http::Response resp {request, resource};
-                    ResponseManager::Respond(request, resp, connection);
-                    return true;
+                    resp.setContent_type(Http::Components::ContentType::ImageJpeg);
+                    ResponseManager::Respond(resp, connection);
+                    return resp.should_close();
                 }
                 catch(int code) {
-                    ResponseManager::Respond(request, {request, code}, connection);
+                    ResponseManager::Respond({request, code}, connection);
+                    return false;
                 }
             }
         }
@@ -54,10 +59,6 @@ bool Dispatcher::Dispatch(IO::Socket& connection)
 
 void Dispatcher::PassToUser(Http::Request request, std::function<Http::Response(Http::Request)> user_handler, IO::Socket& socket)
 {
-    /* from this point, everything is asynchronous */
-//    std::thread request_thread([=, &socket]() {
-        auto response = user_handler(request);
-        ResponseManager::Respond(std::move(request), std::move(response), socket);
-//    });
-    //request_thread.detach();
+    auto response = user_handler(request);
+    ResponseManager::Respond(std::move(response), socket);
 }

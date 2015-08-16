@@ -6,9 +6,8 @@ const uint64_t &Resource::hits() const
     return _hits;
 }
 
-const std::vector<char> &Resource::content()
+const std::vector<char> &Resource::content() const
 {
-    ++_hits;
     return _content;
 }
 

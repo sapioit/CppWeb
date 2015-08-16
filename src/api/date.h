@@ -17,7 +17,8 @@ namespace Http {
         std::string operator()() {
             std::string text;
             text.resize(100);
-            strftime(&text.front(), text.size(), "%a, %d %b %Y %H:%M:%S %Z", &tm);
+            auto size = strftime(&text.front(), text.size(), "%a, %d %b %Y %H:%M:%S %Z", &tm);
+            text.resize(size);
             return text;
         }
 

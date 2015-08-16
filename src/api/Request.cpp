@@ -9,7 +9,15 @@
 
 using namespace Http;
 
+const std::vector<Components::ContentType> &Request::accepted() const
+{
+    return _accepted;
+}
 
+void Request::setAccepted(const std::vector<Components::ContentType> &accepted)
+{
+    _accepted = accepted;
+}
 bool Http::Request::operator==(const Http::Request & other)
 {
     bool bmethod = method == other.method;

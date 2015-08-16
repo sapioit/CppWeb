@@ -96,15 +96,6 @@ std::vector<std::shared_ptr<Socket>> Watcher::Watch() {
             (_events[index].events & EPOLLHUP) ||
             (!(_events[index].events & EPOLLIN))) {
             std::ostringstream error;
-
-//            bool epollerr = (_events[index].events & EPOLLERR) != 0;
-//            bool epollhup = (_events[index].events & EPOLLHUP) != 0;
-//            bool epollin = (_events[index].events & EPOLLIN) != 0;
-//            if(epollerr) error << "EPOLERR ";
-//            if(epollhup) error << "EPOLLHUP ";
-//            if(epollin) error << "EPOLLIN ";
-//            error << "received. errno = " << std::to_string(errno);
-
             int ierror = 0;
             socklen_t errlen = sizeof(ierror);
             if (!getsockopt(_efd, SOL_SOCKET, SO_ERROR, (void *)&ierror, &errlen) == 0)
@@ -112,8 +103,9 @@ std::vector<std::shared_ptr<Socket>> Watcher::Watch() {
                 error << "getsockopt SO_ERROR = " << ierror << " strerror: " << strerror(ierror);
             }
 
-
             Log::e(error.str());
+
+            //TODO call the member Close
             ::close(_events[index].data.fd);
             ::close((*_to_observe[index]).get_fd());
             _to_observe.erase(_to_observe.begin() + index);

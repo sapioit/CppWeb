@@ -22,27 +22,32 @@ public:
     Response& operator=(const Response&) = default;
     ~Response() = default;
 
+    bool should_cache() const;
+    std::uint32_t get_expiry() const;
+    bool should_close() const;
+    bool has_body() const;
+    bool has_resource() const;
+    bool is_error() const;
+
     int code() const;
     void setCode(int code);
 
-    Header::MIME_Type getContent_type() const;
-    void setContent_type(const Header::MIME_Type &value);
-
-    std::string str();
+    const Components::ContentType& getContent_type() const;
+    void setContent_type(const Components::ContentType &value);
 
     const Resource &getResource() const;
     void setResource(const Resource &resource);
 
+    std::string str() const;
+    const Request& getRequest() const;
+
 private:
     Request _request;
+    Resource _resource;
     int _code;
     std::string _text;
-    Resource _resource;
-    Header::MIME_Type content_type = Header::MIME_Type::ApplicationJson;
-
-    // Or, more generally:
+    Components::ContentType _content_type = Components::ContentType::TextPlain;
 };
-//std::ostream& operator<<( std::ostream& o, const Response& r);
 };
 
 #endif // RESPONSE_H

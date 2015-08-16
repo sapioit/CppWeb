@@ -9,7 +9,7 @@
 #include <unordered_map>
 #include <map>
 #include <vector>
-
+#include "components.h"
 namespace Http {
     struct Header {
         Header() = default;
@@ -19,12 +19,8 @@ namespace Http {
         Header& operator=(const Header&) = default;
         ~Header() = default;
 
-        enum class MIME_Type {
-            ApplicationJson
-        };
-
-        MIME_Type mime_type;
-        std::vector<MIME_Type> accepted;
+        Components::ContentType mime_type;
+        std::vector<Components::ContentType> accepted;
 
         std::map<std::string, std::string> fields;
 

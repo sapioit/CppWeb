@@ -1,19 +1,15 @@
 #include "responsemanager.h"
 #include <sstream>
+#include "log.h"
 
-void ResponseManager::Respond(const Http::Request& request, Http::Response response, IO::Socket& socket)
+void ResponseManager::Respond(Http::Response response, IO::Socket& socket)
 {
-    /*TODO:
-     * determine response type
-     * serialize
-     * write to socket
-     */
-
-    auto raw_response = response.str();
     try {
+    auto raw_response = response.str();
         socket.Write(std::move(raw_response));
     }
-    catch(std::runtime_error &ex) {
-        //log
+    catch(std::exception &ex) {
+        Log::e(ex.what());
+        ResponseManager::Respond({response.getRequest(), 500}, socket);
     }
 }
