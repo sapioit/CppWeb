@@ -16,8 +16,10 @@
 class Log
 {
     static std::string _fn;
+    static bool _loggingEnabled;
     public:
         static void Init(const std::string& fileName);
+        static void SetEnabled(bool);
 
         static void i (const std::string &text);
         static void e (const std::string &text);
