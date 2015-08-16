@@ -13,9 +13,7 @@ DEFINES += API_LIBRARY
 
 QMAKE_CXXFLAGS_RELEASE -= -O3
 
-INCLUDEPATH += $$PWD/../../external/jsoncpp/dist
 SOURCES += \
-    $$PWD/../../external/jsoncpp/dist/jsoncpp.cpp \
     server.cpp \
     dispatcher.cpp \
     responsemanager.cpp \
