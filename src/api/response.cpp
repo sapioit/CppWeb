@@ -5,6 +5,7 @@
 #include <iterator>
 #include "log.h"
 #include "DFA.h"
+#include <sstream>
 #include <utility>
 using namespace Http;
 
@@ -57,7 +58,9 @@ std::string Response::str() const {
         switch(machine.currentState()) {
         case states::StatusLine:
         {
-            stream << "HTTP/" << std::setprecision(2) << _request.version << " " << code() << " " << Components::status_codes.at(static_cast<Components::StatusCode>(code())) << crlf;
+            stream << "HTTP/" << "1.1";//std::setprecision(2) << std::to_string(_request.version);
+            stream << " " << code() << " ";
+            stream << Components::status_codes.at(static_cast<Components::StatusCode>(code())) << crlf;
             machine.transition(transitions::EndStatusLine);
             break;
         }

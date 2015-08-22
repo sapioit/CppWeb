@@ -98,7 +98,7 @@ std::vector<std::shared_ptr<Socket>> Watcher::Watch() {
             std::ostringstream error;
             int ierror = 0;
             socklen_t errlen = sizeof(ierror);
-            if (!getsockopt(_efd, SOL_SOCKET, SO_ERROR, (void *)&ierror, &errlen) == 0)
+            if (!getsockopt(_efd, SOL_SOCKET, SO_ERROR, (void *)&ierror, &errlen))
             {
                 error << "getsockopt SO_ERROR = " << ierror << " strerror: " << strerror(ierror);
             }

@@ -35,9 +35,10 @@ bool Dispatcher::Dispatch(IO::Socket& connection)
             else {
                 //it's a resource
                 try {
+                    Log::i("It's a resource");
                     auto &&resource = Storage::GetResource(request.URI.c_str());
                     Http::Response resp {request, resource};
-                    resp.setContent_type(Http::Components::ContentType::ImageJpeg);
+                    resp.setContent_type(Http::Components::ContentType::MovieMp4);
                     ResponseManager::Respond(resp, connection);
                     return resp.should_close();
                 }

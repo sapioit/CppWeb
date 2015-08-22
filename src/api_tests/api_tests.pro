@@ -9,6 +9,7 @@ QT       += network testlib
 QT       -= gui
 
 TARGET = tst_api_teststest
+target.path = /home/vladimir/Desktop
 CONFIG   += console
 CONFIG   -= app_bundle
 CONFIG += c++14

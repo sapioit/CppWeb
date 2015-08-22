@@ -26,6 +26,22 @@ Socket::Socket(std::uint16_t port) : _port(port) {
 
 Socket::Socket(int fd, bool connection) : _fd(fd), _connection(connection) { }
 
+Socket::Socket(const Socket& other)
+{
+    _fd = dup(other.get_fd());//, other.get_fd());
+    if(!other.is_blocking())
+        MakeNonBlocking();
+}
+
+Socket& Socket::operator=(const Socket & other)
+{
+    _fd = dup(other.get_fd());//, other.get_fd());
+    if(!other.is_blocking())
+        MakeNonBlocking();
+
+    return *this;
+}
+
 void Socket::Bind() {
     int bind_result = ::bind(_fd, reinterpret_cast<struct sockaddr *>(&_address), sizeof(_address));
     if (bind_result < 0) {
@@ -74,6 +90,24 @@ std::shared_ptr<Socket> Socket::Accept() {
     return std::make_shared<Socket>(accept_result, true);
 }
 
+ssize_t Socket::Write(const char *data, size_t size) {
+
+    long bytesWritten = ::write(_fd, data, size);
+    if (bytesWritten == -1) {
+//        if (!(((errno == EAGAIN) || (errno == EWOULDBLOCK)) && _blocking)) {
+//            throw std::runtime_error("Error when writing to socket, errno = " + std::to_string(errno));
+//        }
+        return 0;
+    }
+    else
+        return bytesWritten;
+    return 0;
+}
+
+ssize_t Socket::Write(const std::vector<char> &vector) {
+    return Write(vector.data(), vector.size());
+}
+
 int Socket::get_fd() const {
     return _fd;
 }
@@ -105,15 +139,16 @@ bool Socket::is_blocking() const {
     return _blocking;
 }
 
-void Socket::Write(const std::string &string) {
+ssize_t Socket::Write(const std::string &string) {
     try {
-        Write(string.data(), string.length());
+        return Write(string.data(), string.length());
     }
     catch(std::runtime_error &ex) {
         Log::e(ex.what());
         throw;
     }
 }
+
 
 bool Socket::WasShutDown()
 {
@@ -133,30 +168,6 @@ std::uint64_t Socket::getReads() const
 bool Socket::getConnection() const
 {
     return _connection;
-}
-
-
-
-void Socket::Write(const std::vector<char> &vector) {
-    Write(vector.data(), vector.size());
-}
-
-
-void Socket::Write(const char *data, size_t size) {
-    size_t sum = 0;
-
-    while (sum < size) {
-        long bytesWritten = ::write(_fd, data + sum, size);
-        if (bytesWritten == -1) {
-            if (!(((errno == EAGAIN) || (errno == EWOULDBLOCK)) && _blocking)) {
-                throw std::runtime_error("Error when writing to socket, errno = " + std::to_string(errno));
-            }
-        }
-        else
-            sum += bytesWritten;
-    }
-
-    assert(sum == size);
 }
 
 template<class T>
@@ -186,7 +197,7 @@ T Socket::Read(std::size_t size) {
             ssize_t readBytes = ::read(_fd, &result.front(), available);
             if (available != readBytes)
                 throw std::runtime_error("Socket read error on fd = " + std::to_string(_fd) + "."
-                                         "Expected to read " + std::to_string(available) + " bytes, but could only read " +
+                                                                                              "Expected to read " + std::to_string(available) + " bytes, but could only read " +
                                          std::to_string(readBytes) + " bytes");
             ++_reads;
             return result;
@@ -240,4 +251,4 @@ std::string Socket::ReadUntil(const std::string &until, bool peek) {
         }
         else sum += bytesRead;
     } while (true);
-};
+}

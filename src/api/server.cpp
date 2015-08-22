@@ -3,8 +3,10 @@
 #include "Watcher.h"
 #include "Parser.h"
 #include "dispatcher.h"
+#include "storage.h"
 #include <utility>
 #include <algorithm>
+#include <functional>
 #include <iostream>
 #include <thread>
 #include <future>
@@ -18,7 +20,8 @@ std::mutex Log::mLock;
 std::string Log::_fn;
 Server::Server(int port, int maxConcurrent) : _port(port), _maxPending(maxConcurrent)
 {
-    Log::Init("log_file.txt");
+    Log::Init("log_file.txt");        
+    //Log::SetEnabled(true);
     Log::i("Started logging");
 }
 
@@ -30,13 +33,21 @@ void Server::run()
     try {
         _masterSocket = IO::Socket::start_socket(_port, _maxPending);
         IO::Watcher _master_listener(_masterSocket, _maxPending);
+
+        Storage::InitializeOutputScheduler(_maxPending);
+        IO::OutputScheduler &output_scheduler = Storage::output_scheduler();
+        std::thread output_thread(&IO::OutputScheduler::Run, std::ref(output_scheduler));
+
         _master_listener.Start([&](std::vector<std::shared_ptr<IO::Socket>> sockets) {
             for(auto& sock: sockets) {
+                    Log::i("Will dispatch " + std::to_string(sockets.size()) + " connections");
                     bool should_close = Dispatcher::Dispatch((*sock));
                     if(should_close)
                         _master_listener.Close(sock);
             }
         });
+
+        output_thread.join();
     }
     catch(std::exception& ex) {
         Log::e(std::string("Server error: ").append(ex.what()));

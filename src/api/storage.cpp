@@ -6,6 +6,9 @@
 #include <unistd.h>
 #include <thread>
 
+std::unique_ptr<IO::OutputScheduler> Storage::OutScheduler;
+
+
 Resource Storage::GetResource(const std::string &path)
 {
     auto item = CacheManager::GetItem(path);
@@ -16,9 +19,11 @@ Resource Storage::GetResource(const std::string &path)
             cwd = getcwd(0, 0);
             std::string cur_dir(cwd);
             free(cwd);
-            Resource res(path, IO::FileSystem::ReadFile(cur_dir + path));
-            std::thread add_to_cache(CacheManager::PutItem, std::make_pair(path, res));
-            add_to_cache.detach();
+            std::string fpath(cur_dir + path);
+            Resource res(path, IO::FileSystem::ReadFile(fpath));
+            //std::thread add_to_cache(CacheManager::PutItem, std::make_pair(path, res));
+            //add_to_cache.detach();
+            CacheManager::PutItem(std::make_pair(path, res));
 
             return res;
         }
@@ -30,4 +35,14 @@ Resource Storage::GetResource(const std::string &path)
         }
     }
     return item;
+}
+
+void Storage::InitializeOutputScheduler(int max_events)
+{
+    Storage::OutScheduler.reset(new IO::OutputScheduler(max_events));
+}
+
+IO::OutputScheduler &Storage::output_scheduler()
+{
+    return (*Storage::OutScheduler);
 }

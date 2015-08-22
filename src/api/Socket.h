@@ -20,8 +20,9 @@ public:
     int get_fd() const;
     bool is_blocking() const;
     Socket(int port, bool connection);
-    Socket(const Socket &) = delete;
-    Socket operator=(const Socket &) = delete;
+    Socket(const Socket &);
+    Socket(Socket&&) = delete;
+    Socket& operator=(const Socket &);
     virtual ~Socket();
     static std::shared_ptr<Socket> start_socket(int port, int maxConnections);
     void Close();
@@ -35,9 +36,9 @@ public:
     T Read(std::size_t size = 0);
 
     std::string ReadUntil(const std::string &U, bool peek = false);
-    void Write(const char *, std::size_t);
-    void Write(const std::vector<char> &);
-    void Write(const std::string &);
+    ssize_t Write(const char *, std::size_t);
+    ssize_t Write(const std::vector<char> &);
+    ssize_t Write(const std::string &);
     bool WasShutDown();
 
     bool operator<(const Socket&);

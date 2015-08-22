@@ -2,30 +2,22 @@
 #include "Watcher.h"
 #include "Request.h"
 #include "Parser.h"
+#include "server.h"
+#include "dispatcher.h"
+#include "response.h"
 #include <iostream>
 
 int main() {
     try {
-        auto socket = std::make_shared<IO::Socket>(1234);
-        (*socket).Bind();
-        (*socket).MakeNonBlocking();
-        (*socket).Listen(30);
-        IO::Watcher watcher(socket, 30);
-        watcher.Start([](std::shared_ptr<IO::Socket> sock) {
-            try {
-                auto &&req = Http::Parser((*sock))();
-                std::cout << "got request" << std::endl;
+        Web::Server s(1234);
+        Web::Dispatcher::routes.insert(std::make_pair("/adsaf",[](Http::Request req) -> Http::Response {
 
-            }
-            catch (std::exception &ex) {
-                std::cout << ex.what() << std::endl;
-            }
-
-
-        });
+                                           return {req, 200};
+                                       }));
+        s.run();
     }
-    catch (std::runtime_error &ex) {
-        std::cout << ex.what() << std::endl;
+    catch(std::exception &ex) {
+        std::cerr << ex.what();
     }
     return 0;
 }

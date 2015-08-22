@@ -7,11 +7,14 @@
 QT       -= core gui
 
 TARGET = api
-TEMPLATE = lib
-CONFIG += c++14
+TEMPLATE = app
+QMAKE_CXXFLAGS += -std=c++14
+QMAKE_CXXFLAGS += -Wall
 DEFINES += API_LIBRARY
 
-QMAKE_CXXFLAGS_RELEASE -= -O3
+QMAKE_CXXFLAGS_DEBUG += -O0 -g3
+QMAKE_CXXFLAGS_RELEASE -= -O2
+QMAKE_CXXFLAGS_RELEASE += -O3
 
 SOURCES += \
     server.cpp \
@@ -23,7 +26,8 @@ SOURCES += \
     storage.cpp \
     cachemanager.cpp \
     filesystem.cpp \
-    resource.cpp
+    resource.cpp \
+    outputscheduler.cpp
 
 SOURCES += \
     DFA.cpp \
@@ -52,10 +56,11 @@ HEADERS += \
     cachemanager.h \
     filesystem.h \
     resource.h \
-    components.h
+    components.h \
+    outputscheduler.h
 
 unix {
-    target.path = /usr/lib
+    target.path = /mnt/exthdd/debugg
     INSTALLS += target
 }
 

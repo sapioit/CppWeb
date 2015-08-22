@@ -61,7 +61,8 @@ enum class ContentType {
     TextPlain,
     TextHtml,
     ImageJpeg,
-    ImagePng
+    ImagePng,
+    MovieMp4
 };
 
 const std::map<const ContentType, const std::string> content_types {
@@ -69,8 +70,8 @@ const std::map<const ContentType, const std::string> content_types {
             std::make_pair(ContentType::TextPlain, "text/plain"),
             std::make_pair(ContentType::TextHtml, "text/html"),
             std::make_pair(ContentType::ImageJpeg, "image/jpeg"),
-            std::make_pair(ContentType::ImagePng, "image/png")
-
+            std::make_pair(ContentType::ImagePng, "image/png"),
+            std::make_pair(ContentType::MovieMp4, "video/mp4")
 };
 
 enum class StatusCode {
