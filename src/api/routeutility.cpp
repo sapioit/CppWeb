@@ -8,10 +8,6 @@ std::function<Http::Response (Http::Request)> RouteUtility::GetHandler(const Htt
 {
     auto strippedRoute = Http::Parser::StripRoute(request.URI);
     auto result = std::find_if(routes.begin(), routes.end(), [&](const std::pair<std::string, std::function<Http::Response(Http::Request)>>& route) -> bool {
-//        if(route.first == strippedRoute)
-//            return true;
-//        return false;
-
         std::regex regex(route.first);
         return std::regex_match(strippedRoute, regex);
     });
