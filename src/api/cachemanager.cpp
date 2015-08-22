@@ -3,22 +3,19 @@
 std::map<std::string, Resource> CacheManager::_resources;
 std::mutex CacheManager::_putLock;
 
-Resource CacheManager::GetItem(const std::string& path)
-{
-    auto item = CacheManager::_resources.find(path);
-    if(item != CacheManager::_resources.end())
-        return item->second;
+Resource CacheManager::GetItem(const std::string& path) {
+  auto item = CacheManager::_resources.find(path);
+  if (item != CacheManager::_resources.end())
+    return item->second;
 
-    return {};
+  return {};
 }
 
-void CacheManager::PutItem(const std::pair<std::string, Resource> &&item)
-{
-    std::lock_guard<std::mutex> lock(_putLock);
-    CacheManager::_resources.insert(item);
+void CacheManager::PutItem(const std::pair<std::string, Resource>&& item) {
+  std::lock_guard<std::mutex> lock(_putLock);
+  CacheManager::_resources.insert(item);
 }
 
-void CacheManager::ReplaceItem(const std::string &path, const Resource &res)
-{
-    _resources[path] = res;
+void CacheManager::ReplaceItem(const std::string& path, const Resource& res) {
+  _resources[path] = res;
 }
