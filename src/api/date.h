@@ -22,6 +22,10 @@ namespace Http {
             return text;
         }
 
+        bool operator<(const Date& other) {
+            return _time < other._time;
+        }
+
         static Date Now() {
             return Date(time(0));
         }

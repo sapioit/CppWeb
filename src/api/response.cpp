@@ -238,3 +238,8 @@ Response::Response(const Request& request, const Resource & resource) :_request(
 
 }
 
+Response::Response(const Request& request, const Json::Value &json) : _request(request), _code(200), _text(json.toStyledString()), _content_type(Components::ContentType::ApplicationJson)
+{
+
+}
+

@@ -17,3 +17,8 @@ void CacheManager::PutItem(const std::pair<std::string, Resource> &&item)
     std::lock_guard<std::mutex> lock(_putLock);
     CacheManager::_resources.insert(item);
 }
+
+void CacheManager::ReplaceItem(const std::string &path, const Resource &res)
+{
+    _resources[path] = res;
+}

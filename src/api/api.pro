@@ -10,6 +10,7 @@ TARGET = api
 TEMPLATE = app
 QMAKE_CXXFLAGS += -std=c++14
 QMAKE_CXXFLAGS += -Wall
+QMAKE_CXXFLAGS += -Ijson/
 DEFINES += API_LIBRARY
 
 QMAKE_CXXFLAGS_DEBUG += -O0 -g3
@@ -36,6 +37,7 @@ SOURCES += \
     Socket.cpp \
     Watcher.cpp \
     response.cpp \
+    jsoncpp.cpp \
 
 HEADERS += \
     DFA.h \
@@ -57,7 +59,8 @@ HEADERS += \
     filesystem.h \
     resource.h \
     components.h \
-    outputscheduler.h
+    outputscheduler.h \
+    json.h
 
 unix {
     target.path = /mnt/exthdd/debugg

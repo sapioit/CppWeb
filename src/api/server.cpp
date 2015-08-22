@@ -21,7 +21,7 @@ std::string Log::_fn;
 Server::Server(int port, int maxConcurrent) : _port(port), _maxPending(maxConcurrent)
 {
     Log::Init("log_file.txt");        
-    Log::SetEnabled(true);
+    Log::SetEnabled(false);
     Log::i("Started logging");
 }
 
@@ -38,6 +38,7 @@ void Server::run()
         IO::OutputScheduler &output_scheduler = Storage::output_scheduler();
         std::thread output_thread(&IO::OutputScheduler::Run, std::ref(output_scheduler));
 
+        output_thread.detach();
         _master_listener.Start([&](std::vector<std::shared_ptr<IO::Socket>> sockets) {
             for(auto& sock: sockets) {
                     Log::i("Will dispatch " + std::to_string(sockets.size()) + " connections");
@@ -47,7 +48,7 @@ void Server::run()
             }
         });
 
-        output_thread.join();
+        output_thread.detach();
     }
     catch(std::exception& ex) {
         Log::e(std::string("Server error: ").append(ex.what()));

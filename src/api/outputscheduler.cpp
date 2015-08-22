@@ -102,50 +102,57 @@ void log_error(int efd) {
 
 void IO::OutputScheduler::Run()
 {
-    _stopRequested = false;
-    while(!_stopRequested) {
-        int events_number;
-        Log::i("Will wait until a fd is available for writing");
-        do {
-            events_number = epoll_wait(_efd, _events.data(), _maxEv, -1);
-            if (events_number == -1 && errno != EINTR)
-                throw std::runtime_error("Epoll wait error, errno = " + std::to_string(errno));
-        }
-        while (events_number == -1);
-
-        for(auto index = 0; index < events_number; ++index) {
-            Log::i("got " + std::to_string(events_number) + " events (writing)");
-            if (is_error(_events[index].events)) {
-                log_error(_efd);
-                remove_socket(_events[index].data.fd);
+    try {
+        _stopRequested = false;
+        while(!_stopRequested) {
+            int events_number;
+            Log::i("Will wait until a fd is available for writing");
+            do {
+                events_number = epoll_wait(_efd, _events.data(), _maxEv, -1);
+                if (events_number == -1 && errno != EINTR)
+                    throw std::runtime_error("Epoll wait error, errno = " + std::to_string(errno));
             }
-            else {
-                auto scheduled_item_it  = std::find_if(_schedule.begin(), _schedule.end(), [&](const scheduled_write& item) {
-                    if((*item.sock).get_fd() == _events[index].data.fd)
-                        return true;
-                    return false;
-                });
+            while (events_number == -1);
 
-                if(scheduled_item_it != _schedule.end()) {
-                    scheduled_write& swr = *scheduled_item_it;
-
-                    ssize_t bytes_written = (*(*scheduled_item_it).sock).Write(swr.data);
-                    auto written = static_cast<std::size_t>(bytes_written);
-
-                    if(written < (*scheduled_item_it).data.size())
-                    {
-                        auto oldSize = (*scheduled_item_it).data.size();
-                        Log::i("on fd = " + std::to_string(_events[index].data.fd) + ", wrote " + std::to_string(written) + " remaining = " + std::to_string((*scheduled_item_it).data.size() - written));
-                        (*scheduled_item_it).data.erase(0, written);
-                        assert((oldSize - written) == (*scheduled_item_it).data.size());
+            for(auto index = 0; index < events_number; ++index) {
+                Log::i("got " + std::to_string(events_number) + " events (writing)");
+                if (is_error(_events[index].events)) {
+                    log_error(_efd);
+                    remove_socket(_events[index].data.fd);
+                }
+                else {
+                    std::size_t err_pos = static_cast<std::size_t>(-1);
+                    std::size_t scheduled_item_pos = err_pos;
+                    for(decltype(scheduled_item_pos) index2 = 0; index2 < _schedule.size(); ++index2) {
+                        if(_schedule[index2].sock->get_fd() == _events[index].data.fd) {
+                            scheduled_item_pos = index2;
+                        }
                     }
-                    else {
-                        remove_socket((*swr.sock).get_fd());
+
+                    if(scheduled_item_pos != err_pos) {
+                        volatile std::lock_guard<std::mutex> schedule_lock(_scheduling_mutex);
+
+                        if(_schedule[scheduled_item_pos].data.size() == 0)
+                            remove_socket(_schedule[scheduled_item_pos].sock->get_fd());
+
+                        auto written = static_cast<std::size_t>(_schedule[scheduled_item_pos].sock->Write(_schedule[scheduled_item_pos].data));
+                        if(written < _schedule[scheduled_item_pos].data.size()) {
+                            auto oldSize = _schedule[scheduled_item_pos].data.size();
+                            Log::i("on fd = " + std::to_string(_events[index].data.fd) + ", wrote " + std::to_string(written) + " remaining = " + std::to_string(_schedule[scheduled_item_pos].data.size() - written));
+                            std::vector<decltype(_schedule[scheduled_item_pos].data)::value_type>(_schedule[scheduled_item_pos].data.begin() + written, _schedule[scheduled_item_pos].data.end()).swap(_schedule[scheduled_item_pos].data);
+                            //_schedule[scheduled_item_pos].data = std::vector<char>(_schedule[scheduled_item_pos].data.begin() + written, _schedule[scheduled_item_pos].data.end());
+                            auto newSize = _schedule[scheduled_item_pos].data.size();
+                            assert(oldSize - written == newSize);
+                        }
+                        else {
+                            _schedule[scheduled_item_pos].data.clear();
+                            _schedule[scheduled_item_pos].data.shrink_to_fit();
+                        }
                     }
                 }
             }
         }
+    } catch(std::exception& ex) {
+        throw;
     }
 }
-
-

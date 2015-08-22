@@ -6,25 +6,62 @@
 #include "dispatcher.h"
 #include "response.h"
 #include <iostream>
+#include "json.h"
 
 int main() {
     try {
         Web::Server s(1234);
         Web::Dispatcher::routes.insert(std::make_pair("^\\/adsaf\\/json\\/(\\d+)$",[](Http::Request req) -> Http::Response {
                                            // /adsaf/json/<int>
-                                           Http::Response response(req, 200);
-                                           response.setContent_type(Http::Components::ContentType::ApplicationJson);
-                                           response.setText("{\"records\": [{\"Name\" : \"" + req.uri_components()[2] + "\",\"City\" : \"Mega-Bla\", \"Country\" : \"Blaaaa!\"}]}");
 
-                                           return response;
+                                           Json::Value root(Json::arrayValue);
+                                           Json::Value records(Json::arrayValue);
+
+
+                                           Json::Value val;
+                                           val["this"] = "that";
+
+                                           records.append(val);
+
+                                           Json::Value a1(Json::arrayValue);
+                                           decltype(a1) a2(Json::arrayValue);
+
+                                           a1.append("1");
+                                           a1.append("2");
+
+                                           a2.append(req.uri_components()[2]);
+                                           a2.append("2");
+
+                                           records.append(a1);
+                                           records.append(a2);
+
+
+
+                                           root.append(records);
+
+                                           return {req, root};
                                        }));
+
         Web::Dispatcher::routes.insert(std::make_pair("^\\/adsaf\\/json\\/$",[](Http::Request req) -> Http::Response {
                                            // /adsaf/json/
-                                           Http::Response response(req, 200);
-                                           response.setContent_type(Http::Components::ContentType::ApplicationJson);
-                                           response.setText("{\"records\": [{\"Name\" : \"asdf\",\"City\" : \"Mega-Bla\", \"Country\" : \"Blaaaa!\"}]}");
+                                           Json::Value root(Json::arrayValue);
+                                           Json::Value records(Json::arrayValue);
 
-                                           return response;
+                                           Json::Value a1(Json::arrayValue);
+                                           decltype(a1) a2(Json::arrayValue);
+
+                                           a1.append({"1"});
+                                           a1.append({"2"});
+
+                                           a2.append({"3"});
+                                           a2.append({"4"});
+
+                                           records.append(a1);
+                                           records.append(a2);
+
+                                           root.append(records);
+
+                                           return {req, root};
                                        }));
         s.run();
     }

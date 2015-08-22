@@ -6,6 +6,7 @@
 #include "Header.h"
 #include "resource.h"
 #include "Request.h"
+#include "json.h"
 
 namespace Http{
 class Response
@@ -17,6 +18,7 @@ public:
     Response(const Request&, const std::string&);
     Response(const Request&, int, const std::string&);
     Response(const Request&, const Resource&);
+    Response(const Request&, const Json::Value&);
     Response(const Response&) = default;
     Response(Response&&) = default;
     Response& operator=(const Response&) = default;
