@@ -16,7 +16,7 @@ const std::string &Resource::path() const
     return _path;
 }
 
-Resource::Resource(const std::string & path, const std::vector<char> & content) : _path(path), _content(content)
+Resource::Resource(const std::string & path, const std::vector<char> &content) : _path(path), _content(content)
 {
 
 }

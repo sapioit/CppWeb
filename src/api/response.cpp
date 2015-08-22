@@ -58,7 +58,7 @@ std::string Response::str() const {
         switch(machine.currentState()) {
         case states::StatusLine:
         {
-            stream << "HTTP/" << "1.1";//std::setprecision(2) << std::to_string(_request.version);
+            stream << "HTTP/" << std::setprecision(2) << 1.1;
             stream << " " << code() << " ";
             stream << Components::status_codes.at(static_cast<Components::StatusCode>(code())) << crlf;
             machine.transition(transitions::EndStatusLine);
@@ -68,22 +68,37 @@ std::string Response::str() const {
         {
             stream << "Date:" << " " << Date::Now()() << crlf;
             stream << "Connection: " << (should_close() ? "Close" : "Keep-Alive") << crlf;
-//            if(is_error())
-//                machine.transition(transitions::Error);
-//            else
-                machine.transition(transitions::EndGeneralHeader);
+            //            if(is_error())
+            //                machine.transition(transitions::Error);
+            //            else
+            machine.transition(transitions::EndGeneralHeader);
             break;
         }
         case states::ResponseHeader:
         {
-            auto type_str = mime_types.find(getContent_type());
-            if(type_str == mime_types.end())
+            auto type_str_it =  mime_types.find(getContent_type());
+            if(type_str_it == mime_types.end())
                 throw 415;
-            stream << Http::Header::Fields::Content_Type << ": " << type_str->second << crlf;
-            stream << Http::Header::Fields::Content_Length << ": " << _resource.content().size()  << crlf;
+            std::string type_str(type_str_it->second);
+            stream << Http::Header::Fields::Content_Type << ": " << type_str << crlf;
+            stream << Http::Header::Fields::Content_Length << ": ";
+                      if(has_resource())
+                        stream << _resource.content().size();
+                      else stream << _text.size();
+            stream << crlf;
             stream << Http::Header::Fields::Cache_Control << ": " << (should_cache() ? "max-age=" + std::to_string(get_expiry()) : "no-cache") << crlf;
-            if(has_resource())
-                stream << Http::Header::Fields::Transfer_Encoding << ": " << "binary" << crlf;
+            if(has_resource()) {
+                if(getContent_type() == Components::ContentType::TextHtml ||
+                        getContent_type() == Components::ContentType::TextPlain) {
+                    //stream << Http::Header::Fields::Transfer_Encoding << ": " << "8bit";
+                }
+                else {
+                    stream << Http::Header::Fields::Transfer_Encoding << ": " << "binary" << crlf;
+                }
+            }
+            else {
+                //TODO
+            }
             machine.transition(transitions::EndResponseHeader);
             break;
         }
@@ -97,8 +112,11 @@ std::string Response::str() const {
         {
             if(has_resource()) {
                 std::copy(_resource.content().begin(), _resource.content().end(), std::ostream_iterator<char>(stream));
-                stream << crlf;
             }
+            else {
+                stream << _text;
+            }
+            stream << crlf;
             machine.transition(transitions::EndBody);
             break;
         }
@@ -115,65 +133,23 @@ std::string Response::str() const {
         }
     }
 
-
     return stream.str();
 }
 
-//std::string Response::str() const
-//{
-//    std::ostringstream stream;
-//    constexpr auto crlf = "\r\n";
-//    const decltype(Components::content_types)& mime_types = Components::content_types;
-
-//    stream << "HTTP/" << std::setprecision(2) << _request.version << " " << code() << " " << Components::status_codes.at(static_cast<Components::StatusCode>(code())) << crlf;
-//    stream << "Date:" << " " << Date::Now()() << crlf;
-//    stream << "Connection: " << (should_close() ? "Close" : "Keep-Alive") << crlf;
-
-//    if(!is_error()) {
-//        auto type_str = mime_types.find(getContent_type());
-//        if(type_str == mime_types.end())
-//            throw 415;
-
-//        if(has_resource()){
-//            stream << Http::Header::Fields::Content_Type << ": " << type_str->second << crlf;
-//            stream << Http::Header::Fields::Content_Length << ": " << _resource.content().size()  << crlf;
-//            //stream << Http::Header::Fields::Cache_Control << ": " << (should_cache() ? "max-age=" + std::to_string(get_expiry()) : "no-cache") << crlf;
-//            stream << Http::Header::Fields::Transfer_Encoding << ": " << "binary" << crlf;
-//        }
-//        else {
-//            // text response
-//            if(has_body()) {
-//                stream << Http::Header::Fields::Content_Type << ": " << type_str->second + "; "  + "charset=utf-8" << crlf;
-//                stream << Http::Header::Fields::Content_Length << ": " << _text.size() << crlf;
-//            }
-//        }
-
-//        stream << crlf;
-//        Log::i(stream.str());
-//        // start of body
-//        if(has_body()) {
-//            if(has_resource())
-//                std::copy(_resource.content().begin(), _resource.content().end(), std::ostream_iterator<char>(stream));
-//            else
-//                std::copy(_text.begin(), _text.end(), std::ostream_iterator<char>(stream));
-//            stream << crlf;
-//            stream << crlf;
-//        }
-//    }
-//    else {
-//        stream << Http::Header::Fields::Content_Length << ": " << 123  << crlf;
-//        stream << crlf;
-//    }
-
-//    auto response_str = stream.str();
-//    if(is_error())
-//        Log::i(response_str);
-//    return response_str;
-//}
 const Request &Response::getRequest() const
 {
     return _request;
 }
+std::string Response::getText() const
+{
+    return _text;
+}
+
+void Response::setText(const std::string &text)
+{
+    _text = text;
+}
+
 
 
 bool Response::should_cache() const

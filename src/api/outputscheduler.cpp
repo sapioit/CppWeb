@@ -10,7 +10,7 @@
 
 inline void IO::OutputScheduler::add_socket(const IO::Socket &sock, const std::string& data)
 {
-    //Log::i("socket with fd = " + std::to_string(sock.get_fd()) + " will be copied to fd = ");
+    Log::i("socket with fd = " + std::to_string(sock.get_fd()) + " will be copied to fd = ");
     std::unique_ptr<IO::Socket> new_sock(new Socket(sock));
 
     scheduled_write sw(std::move(new_sock), data);
@@ -22,7 +22,7 @@ inline void IO::OutputScheduler::add_socket(const IO::Socket &sock, const std::s
     ev.data.fd = (*_schedule.back().sock).get_fd();
     ev.events = EPOLLOUT | EPOLLET;
 
-    //Log::i(std::to_string(_schedule[_schedule.size() - 1]).sock.get_fd());
+    Log::i(std::to_string((*_schedule.back().sock).get_fd()));
 
     if(-1 == epoll_ctl(_efd, EPOLL_CTL_ADD, ev.data.fd, &ev))
         throw std::runtime_error("Could not add event with fd:" + std::to_string(sock.get_fd()));
@@ -129,16 +129,23 @@ void IO::OutputScheduler::Run()
                 if(scheduled_item_it != _schedule.end()) {
                     scheduled_write& swr = *scheduled_item_it;
 
-                    std::size_t written = (*swr.sock).Write(swr.data);
-                    if(written >= swr.data.size()) {
-                        remove_socket((*swr.sock).get_fd());
+                    ssize_t bytes_written = (*(*scheduled_item_it).sock).Write(swr.data);
+                    auto written = static_cast<std::size_t>(bytes_written);
+
+                    if(written < (*scheduled_item_it).data.size())
+                    {
+                        auto oldSize = (*scheduled_item_it).data.size();
+                        Log::i("on fd = " + std::to_string(_events[index].data.fd) + ", wrote " + std::to_string(written) + " remaining = " + std::to_string((*scheduled_item_it).data.size() - written));
+                        (*scheduled_item_it).data.erase(0, written);
+                        assert((oldSize - written) == (*scheduled_item_it).data.size());
                     }
                     else {
-                        swr.data.erase(0, written);
+                        remove_socket((*swr.sock).get_fd());
                     }
                 }
             }
         }
     }
-
 }
+
+

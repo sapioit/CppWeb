@@ -15,6 +15,7 @@ namespace Http {
 
     class Request {
         std::vector<Components::ContentType> _accepted;
+        std::vector<std::string> _uri_components;
     public:
         Components::Method method;
         Header header;
@@ -30,6 +31,9 @@ namespace Http {
 
         const std::vector<Components::ContentType>& accepted() const;
         void setAccepted(const std::vector<Components::ContentType> &accepted);
+
+        std::vector<std::string> uri_components() const;
+        void setUri_components(const std::vector<std::string> &uri_components);
     };
 }
 

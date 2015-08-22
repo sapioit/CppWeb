@@ -7,6 +7,7 @@
 #include "log.h"
 #include "responsemanager.h"
 #include "storage.h"
+#include "Parser.h"
 #include "components.h"
 
 std::map<std::string, std::function<Http::Response(Http::Request)>> Web::Dispatcher::routes;
@@ -21,7 +22,7 @@ bool Dispatcher::Dispatch(IO::Socket& connection)
             if(!request.IsResource()) {
                 auto handler = RouteUtility::GetHandler(request, routes);
                 if(handler) {
-                    //PassToUser(request, handler, connection);
+                    request.setUri_components(Http::Parser::Split(Http::Parser::StripRoute(request.URI), '/'));
                     auto response = handler(request);
                     ResponseManager::Respond(response, connection);
                     return response.should_close();
@@ -38,7 +39,7 @@ bool Dispatcher::Dispatch(IO::Socket& connection)
                     Log::i("It's a resource");
                     auto &&resource = Storage::GetResource(request.URI.c_str());
                     Http::Response resp {request, resource};
-                    resp.setContent_type(Http::Components::ContentType::MovieMp4);
+                    resp.setContent_type(Http::Parser::GetMimeTypeByExtension(request.URI));
                     ResponseManager::Respond(resp, connection);
                     return resp.should_close();
                 }

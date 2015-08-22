@@ -18,6 +18,16 @@ void Request::setAccepted(const std::vector<Components::ContentType> &accepted)
 {
     _accepted = accepted;
 }
+
+std::vector<std::string> Request::uri_components() const
+{
+    return _uri_components;
+}
+
+void Request::setUri_components(const std::vector<std::string> &uri_components)
+{
+    _uri_components = uri_components;
+}
 bool Http::Request::operator==(const Http::Request & other)
 {
     bool bmethod = method == other.method;
@@ -48,7 +58,7 @@ bool Http::Request::IsPassable() const
 
 bool Http::Request::IsResource() const
 {
-    std::regex extensions(".*\\.(jpg|jpeg|png|gif|zip|pdf|mp4)$", std::regex::ECMAScript|std::regex::icase);
+    std::regex extensions(".*\\.(jpg|jpeg|png|gif|zip|pdf|mp4|html|json)$", std::regex::ECMAScript|std::regex::icase);
     bool match = std::regex_match(URI, extensions);
     return match;
 }

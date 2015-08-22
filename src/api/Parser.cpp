@@ -6,6 +6,9 @@
 #include "log.h"
 #include "components.h"
 #include <cassert>
+#include <sstream>
+#include <iostream>
+#include <string>
 using namespace Http;
 constexpr auto space = ' ';
 constexpr auto token = ':';
@@ -96,6 +99,50 @@ Header Parser::GetHeader() {
     header.mime_type = GetMimeType(header.fields[Header::Fields::Content_Type]);
     return header;
 }
+
+Components::ContentType Parser::GetMimeTypeByExtension(const std::string &URI)
+{
+    auto dot = URI.find_last_of('.');
+    std::string ext(URI.begin() + dot + 1, URI.end());
+
+    using namespace Components;
+
+
+    if(ext == "png") return ContentType::ImagePng;
+    if(ext == "jpg") return ContentType::ImageJpeg;
+    if(ext == "mp4") return ContentType::MovieMp4;
+    if(ext == "html") return ContentType::TextHtml;
+    if(ext == "json") return ContentType::ApplicationJson;
+
+    return ContentType::TextPlain;
+}
+
+std::string Parser::StripRoute(const std::string &URI)
+{
+
+    auto firstSlash = URI.find_first_of('/');
+    return {URI.begin() + firstSlash, URI.end()};
+}
+
+std::vector<std::string> Parser::Split(std::string source, char delimiter)
+{
+    std::vector<std::string> result;
+    //    std::size_t pos = 0;
+    //    while ((pos = source.find(delimiter)) != std::string::npos) {
+    //        result.push_back(source.substr(0, pos));
+    //        source.erase(0, pos + delimiter.length());
+    //    }
+    std::istringstream ss(source); // Turn the string into a stream.
+    std::string tok;
+
+    while(std::getline(ss, tok, delimiter)) {
+        if(!tok.empty())
+            result.push_back(tok);
+    }
+    return result;
+}
+
+
 
 
 //Request HttpUtility::ParseFrom(std::shared_ptr<IO::Socket> socket) {

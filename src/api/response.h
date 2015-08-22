@@ -41,6 +41,9 @@ public:
     std::string str() const;
     const Request& getRequest() const;
 
+    std::string getText() const;
+    void setText(const std::string &text);
+
 private:
     Request _request;
     Resource _resource;

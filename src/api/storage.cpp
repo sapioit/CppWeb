@@ -21,8 +21,6 @@ Resource Storage::GetResource(const std::string &path)
             free(cwd);
             std::string fpath(cur_dir + path);
             Resource res(path, IO::FileSystem::ReadFile(fpath));
-            //std::thread add_to_cache(CacheManager::PutItem, std::make_pair(path, res));
-            //add_to_cache.detach();
             CacheManager::PutItem(std::make_pair(path, res));
 
             return res;

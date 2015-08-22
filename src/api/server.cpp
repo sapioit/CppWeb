@@ -21,7 +21,7 @@ std::string Log::_fn;
 Server::Server(int port, int maxConcurrent) : _port(port), _maxPending(maxConcurrent)
 {
     Log::Init("log_file.txt");        
-    //Log::SetEnabled(true);
+    Log::SetEnabled(true);
     Log::i("Started logging");
 }
 

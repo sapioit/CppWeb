@@ -68,7 +68,7 @@ enum class ContentType {
 const std::map<const ContentType, const std::string> content_types {
     std::make_pair(ContentType::ApplicationJson, "application/json"),
             std::make_pair(ContentType::TextPlain, "text/plain"),
-            std::make_pair(ContentType::TextHtml, "text/html"),
+            std::make_pair(ContentType::TextHtml, "text/html; charset=utf-8"),
             std::make_pair(ContentType::ImageJpeg, "image/jpeg"),
             std::make_pair(ContentType::ImagePng, "image/png"),
             std::make_pair(ContentType::MovieMp4, "video/mp4")

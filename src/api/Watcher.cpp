@@ -41,21 +41,13 @@ void Watcher::Close(int fd) {
     }
     auto result = epoll_ctl(_efd, EPOLL_CTL_DEL, fd, ev);
 
-    if(result == 0)
-    {
-        Log::i("closed event on fd = " + std::to_string(ev->data.fd));
-    }
-
     for(std::size_t index = 0; index < _to_observe.size(); ++index) {
         if((*_to_observe[index]).get_fd() == fd)
         {
             _to_observe.erase(_to_observe.begin() + index);
-            Log::i("closed socket with fd = " + std::to_string(fd));
             break;
         }
     }
-    Log::i("sockets left to observe: " + std::to_string(_to_observe.size()));
-    Log::i("events left in the vector: " + std::to_string(_events.size()) + "\n");
 }
 
 void Watcher::Close(std::shared_ptr<Socket> sock)
@@ -127,7 +119,6 @@ std::vector<std::shared_ptr<Socket>> Watcher::Watch() {
                     }
                     (*new_connection).MakeNonBlocking();
                     AddSocket(new_connection);
-                    Log::i("added new socket with fd = " + std::to_string((*new_connection).get_fd()));
                 }
             }
             catch (std::exception &ex) {

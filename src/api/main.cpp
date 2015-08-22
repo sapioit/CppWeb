@@ -10,9 +10,21 @@
 int main() {
     try {
         Web::Server s(1234);
-        Web::Dispatcher::routes.insert(std::make_pair("/adsaf",[](Http::Request req) -> Http::Response {
+        Web::Dispatcher::routes.insert(std::make_pair("^\\/adsaf\\/json\\/(\\d+)$",[](Http::Request req) -> Http::Response {
+                                           // /adsaf/json/<int>
+                                           Http::Response response(req, 200);
+                                           response.setContent_type(Http::Components::ContentType::ApplicationJson);
+                                           response.setText("{\"records\": [{\"Name\" : \"" + req.uri_components()[2] + "\",\"City\" : \"Mega-Bla\", \"Country\" : \"Blaaaa!\"}]}");
 
-                                           return {req, 200};
+                                           return response;
+                                       }));
+        Web::Dispatcher::routes.insert(std::make_pair("^\\/adsaf\\/json\\/$",[](Http::Request req) -> Http::Response {
+                                           // /adsaf/json/
+                                           Http::Response response(req, 200);
+                                           response.setContent_type(Http::Components::ContentType::ApplicationJson);
+                                           response.setText("{\"records\": [{\"Name\" : \"asdf\",\"City\" : \"Mega-Bla\", \"Country\" : \"Blaaaa!\"}]}");
+
+                                           return response;
                                        }));
         s.run();
     }
