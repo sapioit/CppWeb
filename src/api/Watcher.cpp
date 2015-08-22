@@ -83,7 +83,6 @@ std::vector<std::shared_ptr<Socket>> Watcher::Watch() {
     while (events_number == -1);
     _events.resize(events_number);
     for (int index = 0; index < events_number; ++index) {
-        Log::i("got " + std::to_string(events_number) + " events");
         if ((_events[index].events & EPOLLERR) ||
             (_events[index].events & EPOLLHUP) ||
             (!(_events[index].events & EPOLLIN))) {

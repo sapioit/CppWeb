@@ -63,6 +63,14 @@ int main() {
 
                                            return {req, root};
                                        }));
+        Settings settings;
+#ifndef __arm__
+        settings.root_path = "/run/user/1000/gvfs/smb-share:server=192.168.2.103,share=backup/server";
+#else
+        settings.root_path = "/mnt/exthdd/server";
+#endif
+        settings.max_connections = 1000;
+        s.setSettings(settings);
         s.run();
     }
     catch(std::exception &ex) {

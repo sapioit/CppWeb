@@ -1,6 +1,6 @@
 # Compiler
 CC = g++
-OPTS = -fPIC -std=c++14 -O3 -g0 -Wall -D_REENTRANT
+OPTS = -fPIC -std=c++14 -O3 -g0 -Wall -D_REENTRANT -I./json/
 
 # Project name
 PROJECT = server

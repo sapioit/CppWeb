@@ -106,7 +106,7 @@ void IO::OutputScheduler::Run()
         _stopRequested = false;
         while(!_stopRequested) {
             int events_number;
-            Log::i("Will wait until a fd is available for writing");
+            //Log::i("Will wait until a fd is available for writing");
             do {
                 events_number = epoll_wait(_efd, _events.data(), _maxEv, -1);
                 if (events_number == -1 && errno != EINTR)

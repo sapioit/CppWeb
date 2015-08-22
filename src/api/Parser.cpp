@@ -127,11 +127,6 @@ std::string Parser::StripRoute(const std::string &URI)
 std::vector<std::string> Parser::Split(std::string source, char delimiter)
 {
     std::vector<std::string> result;
-    //    std::size_t pos = 0;
-    //    while ((pos = source.find(delimiter)) != std::string::npos) {
-    //        result.push_back(source.substr(0, pos));
-    //        source.erase(0, pos + delimiter.length());
-    //    }
     std::istringstream ss(source); // Turn the string into a stream.
     std::string tok;
 

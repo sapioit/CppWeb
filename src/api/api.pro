@@ -28,7 +28,8 @@ SOURCES += \
     cachemanager.cpp \
     filesystem.cpp \
     resource.cpp \
-    outputscheduler.cpp
+    outputscheduler.cpp \
+    settings.cpp
 
 SOURCES += \
     DFA.cpp \
@@ -60,7 +61,8 @@ HEADERS += \
     resource.h \
     components.h \
     outputscheduler.h \
-    json.h
+    json.h \
+    settings.h
 
 unix {
     target.path = /mnt/exthdd/debugg

@@ -1,5 +1,6 @@
 #include "filesystem.h"
 #include <fstream>
+#include <unistd.h>
 using namespace IO;
 
 std::vector<char> FileSystem::ReadFile(const std::string &path)
@@ -10,4 +11,14 @@ std::vector<char> FileSystem::ReadFile(const std::string &path)
     std::vector<char> fileContents((std::istreambuf_iterator<char>(stream)),
                                    std::istreambuf_iterator<char>());
     return fileContents;
+}
+
+std::string FileSystem::GetCurrentDirectory()
+{
+    char* cwd = NULL;
+    cwd = getcwd(0, 0);
+    std::string cur_dir(cwd);
+    free(cwd);
+
+    return cur_dir;
 }

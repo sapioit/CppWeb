@@ -18,11 +18,17 @@ using namespace Web;
 
 std::mutex Log::mLock;
 std::string Log::_fn;
-Server::Server(int port, int maxConcurrent) : _port(port), _maxPending(maxConcurrent)
+Server::Server(int port) : _port(port)
 {
     Log::Init("log_file.txt");        
     Log::SetEnabled(false);
     Log::i("Started logging");
+    setSettings({});
+}
+
+void Server::setSettings(const Settings& s) {
+    Storage::setSettings(s);
+    _maxPending = s.max_connections;
 }
 
 

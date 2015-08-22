@@ -3,19 +3,27 @@
 #include "filesystem.h"
 #include <system_error>
 #include <utility>
-#include <unistd.h>
 #include <thread>
 
 std::unique_ptr<IO::OutputScheduler> Storage::OutScheduler;
 
+Settings Storage::_settings;
+
+
+const Settings& Storage::settings()
+{
+    return Storage::_settings;
+}
+
+void Storage::setSettings(const Settings &settings)
+{
+    Storage::_settings = settings;
+}
 
 Resource Storage::GetResource(const std::string &path)
 {
-    char* cwd = NULL;
-    cwd = getcwd(0, 0);
-    std::string cur_dir(cwd);
-    free(cwd);
-    std::string fpath(cur_dir + path);
+
+    std::string fpath(Storage::settings().root_path + path);
 
     auto item = CacheManager::GetItem(fpath);
 

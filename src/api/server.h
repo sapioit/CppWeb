@@ -5,14 +5,16 @@
 #include <memory>
 #include "Socket.h"
 #include <fstream>
+#include "settings.h"
 #include "log.h"
 
 namespace Web{
 class Server
 {
 public:
-    Server(int, int = 1000);
+    Server(int);
     void run();
+    void setSettings(const Settings&);
 
     int maxPending() const;
     void setMaxPending(int maxPending);

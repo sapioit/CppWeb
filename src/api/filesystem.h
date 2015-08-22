@@ -20,6 +20,7 @@ class FileSystem
 {
 public:
     static std::vector<char> ReadFile(const std::string& path);
+    static std::string GetCurrentDirectory();
 };
 };
 
