@@ -41,6 +41,10 @@ void Watcher::Close(int fd) {
     }
     auto result = epoll_ctl(_efd, EPOLL_CTL_DEL, fd, ev);
 
+    if(result == -1) {
+        //error
+    }
+
     for(std::size_t index = 0; index < _to_observe.size(); ++index) {
         if((*_to_observe[index]).get_fd() == fd)
         {

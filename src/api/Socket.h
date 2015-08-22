@@ -49,7 +49,8 @@ public:
 private:
     std::uint16_t _port;
     std::uint64_t _reads = 0;
-    int _opt = 1, _fd = -1;
+    int _opt = 1;
+    int _fd = -1;
     struct sockaddr_in _address;
     bool _blocking = false;
     bool _connection;

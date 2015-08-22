@@ -54,7 +54,7 @@ void Server::run()
             }
         });
 
-        output_thread.detach();
+        output_thread.join();
     }
     catch(std::exception& ex) {
         Log::e(std::string("Server error: ").append(ex.what()));

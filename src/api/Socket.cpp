@@ -92,7 +92,7 @@ std::shared_ptr<Socket> Socket::Accept() {
 
 ssize_t Socket::Write(const char *data, size_t size) {
 
-    long bytesWritten = ::write(_fd, data, size);
+    auto bytesWritten = ::write(_fd, static_cast<const void*>(data), size);
     if (bytesWritten == -1) {
 //        if (!(((errno == EAGAIN) || (errno == EWOULDBLOCK)) && _blocking)) {
 //            throw std::runtime_error("Error when writing to socket, errno = " + std::to_string(errno));

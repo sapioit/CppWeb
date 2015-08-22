@@ -121,6 +121,8 @@ void IO::OutputScheduler::Run()
                     remove_socket(_events[index].data.fd);
                 }
                 else {
+                    volatile std::lock_guard<std::mutex> schedule_lock(_scheduling_mutex);
+
                     std::size_t err_pos = static_cast<std::size_t>(-1);
                     std::size_t scheduled_item_pos = err_pos;
                     for(decltype(scheduled_item_pos) index2 = 0; index2 < _schedule.size(); ++index2) {
@@ -130,7 +132,6 @@ void IO::OutputScheduler::Run()
                     }
 
                     if(scheduled_item_pos != err_pos) {
-                        volatile std::lock_guard<std::mutex> schedule_lock(_scheduling_mutex);
 
                         if(_schedule[scheduled_item_pos].data.size() == 0)
                             remove_socket(_schedule[scheduled_item_pos].sock->get_fd());
