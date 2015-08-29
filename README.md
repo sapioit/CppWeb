@@ -7,7 +7,7 @@ This is a HTTP web server written in, just to prove that websites can be written
 Goals:
 - Should be used as a library. One only has to provide the routes/methods, and a callback function
 - High performance on low-spec servers, should be able to handle a small website running on a Raspberry PI with no problem
-- Minimal use of threading, at least for now (as I'm writing this, everything is single threaded)
+- Minimal use of threading, at least for now
 - To be used as a backend for JS frameworks like Angular
 
 Plans for the future:

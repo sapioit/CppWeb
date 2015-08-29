@@ -10,14 +10,13 @@ TARGET = api
 TEMPLATE = app
 QMAKE_CXXFLAGS += -std=c++14
 QMAKE_CXXFLAGS += -Wall
-QMAKE_CXXFLAGS += -Ijson/ -I$$PWD
+QMAKE_CXXFLAGS += -Ijson/
 DEFINES += API_LIBRARY
-
-message($$PWD)
 
 QMAKE_CXXFLAGS_DEBUG += -O0 -g3
 QMAKE_CXXFLAGS_RELEASE -= -O2
 QMAKE_CXXFLAGS_RELEASE += -O3
+
 
 #HTTP
 SOURCES += \
@@ -36,7 +35,9 @@ HEADERS += \
     http/request.h \
     http/response.h \
     http/responsemanager.h \
-    http/routeutility.h
+    http/routeutility.h \
+    io/datapacket.h \
+    io/scheduled_write.h
 #HTTP-END
 
 #IO
@@ -61,9 +62,19 @@ HEADERS += \
     json/json.h
 #JSON-END
 
+
+#SERVER
+SOURCES += \
+    server/dispatcher.cpp \
+    server/server.cpp
+
+HEADERS += \
+    server/dispatcher.h \
+    server/server.h \
+#SERVER-END
+
 #MISC
 SOURCES += \
-    misc/dfa.cpp \
     misc/log.cpp \
     misc/resource.cpp \
     misc/settings.cpp \
@@ -77,16 +88,6 @@ HEADERS += \
     misc/settings.h \
     misc/storage.h
 #MISC-END
-
-#SERVER
-SOURCES += \
-    server/dispatcher.cpp \
-    server/server.cpp
-
-HEADERS += \
-    server/dispatcher.h \
-    server/server.h \
-#SERVER-END
 
 SOURCES += \
     main.cpp

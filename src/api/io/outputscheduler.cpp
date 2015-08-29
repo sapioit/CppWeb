@@ -107,6 +107,28 @@ int IO::OutputScheduler::GetEvents() {
   return ev_no;
 }
 
+void IO::OutputScheduler::Write(const epoll_event& event,
+                                std::size_t scheduled_item_pos) {
+  auto written =
+      static_cast<std::size_t>(_schedule[scheduled_item_pos].sock->Write(
+          _schedule[scheduled_item_pos].data));
+  if (written < _schedule[scheduled_item_pos].data.size()) {
+    auto oldSize = _schedule[scheduled_item_pos].data.size();
+    Log::i("on fd = " + std::to_string(event.data.fd) + ", wrote " +
+           std::to_string(written) + " remaining = " +
+           std::to_string(_schedule[scheduled_item_pos].data.size() - written));
+    std::vector<decltype(_schedule[scheduled_item_pos].data)::value_type>(
+        _schedule[scheduled_item_pos].data.begin() + written,
+        _schedule[scheduled_item_pos].data.end())
+        .swap(_schedule[scheduled_item_pos].data);
+    auto newSize = _schedule[scheduled_item_pos].data.size();
+    assert(oldSize - written == newSize);
+  } else {
+    _schedule[scheduled_item_pos].data.clear();
+    _schedule[scheduled_item_pos].data.shrink_to_fit();
+  }
+}
+
 void IO::OutputScheduler::Run() {
   try {
     _stopRequested = false;
@@ -133,26 +155,7 @@ void IO::OutputScheduler::Run() {
             if (_schedule[scheduled_item_pos].data.size() == 0)
               remove_socket(_schedule[scheduled_item_pos].sock->get_fd());
 
-            auto written = static_cast<std::size_t>(
-                _schedule[scheduled_item_pos].sock->Write(
-                    _schedule[scheduled_item_pos].data));
-            if (written < _schedule[scheduled_item_pos].data.size()) {
-              auto oldSize = _schedule[scheduled_item_pos].data.size();
-              Log::i("on fd = " + std::to_string(_events[index].data.fd) +
-                     ", wrote " + std::to_string(written) + " remaining = " +
-                     std::to_string(_schedule[scheduled_item_pos].data.size() -
-                                    written));
-              std::vector<decltype(
-                  _schedule[scheduled_item_pos].data)::value_type>(
-                  _schedule[scheduled_item_pos].data.begin() + written,
-                  _schedule[scheduled_item_pos].data.end())
-                  .swap(_schedule[scheduled_item_pos].data);
-              auto newSize = _schedule[scheduled_item_pos].data.size();
-              assert(oldSize - written == newSize);
-            } else {
-              _schedule[scheduled_item_pos].data.clear();
-              _schedule[scheduled_item_pos].data.shrink_to_fit();
-            }
+            Write(_events[index], scheduled_item_pos);
           }
         }
       }

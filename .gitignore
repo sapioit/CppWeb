@@ -34,3 +34,5 @@ Makefile*
 *.qmlproject.user.*
 
 log_file.txt
+*/Debug/*
+*/Release/*

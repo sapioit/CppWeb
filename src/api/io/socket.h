@@ -5,6 +5,8 @@
 #ifndef SOCKET_SOCKET_H
 #define SOCKET_SOCKET_H
 
+#include <io/datapacket.h>
+
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
@@ -21,7 +23,7 @@ public:
   bool is_blocking() const;
   Socket(int port, bool connection);
   Socket(const Socket&);
-  Socket(Socket&&) = delete;
+  Socket(Socket&&);
   Socket& operator=(const Socket&);
   virtual ~Socket();
   static std::shared_ptr<Socket> start_socket(int port, int maxConnections);
@@ -38,6 +40,7 @@ public:
   ssize_t Write(const char*, std::size_t);
   ssize_t Write(const std::vector<char>&);
   ssize_t Write(const std::string&);
+  ssize_t Write(File&);
   bool WasShutDown();
 
   bool operator<(const Socket&);

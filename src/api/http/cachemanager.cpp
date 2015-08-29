@@ -42,7 +42,7 @@ Resource CacheManager::GetResource(const std::string& path) {
           Resource res(fpath);
           CacheManager::ReplaceItem(fpath, res);
           return res;
-        } catch (IO::fs_error& ex) {
+        } catch (IO::FileSystem::fs_error& ex) {
           throw 404;
         } catch (std::system_error& ex) {
           throw 500;
@@ -55,7 +55,7 @@ Resource CacheManager::GetResource(const std::string& path) {
       Resource res(fpath);
       CacheManager::PutItem(std::make_pair(fpath, res));
       return res;
-    } catch (IO::fs_error& ex) {
+    } catch (IO::FileSystem::fs_error& ex) {
       throw 404;
     } catch (std::system_error& ex) {
       throw 500;

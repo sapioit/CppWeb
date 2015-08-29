@@ -7,6 +7,7 @@
 
 #include <sys/fcntl.h>
 #include <sys/ioctl.h>
+#include <sys/sendfile.h>
 #include <system_error>
 #include <assert.h>
 
@@ -31,6 +32,13 @@ Socket::Socket(const Socket& other) {
   _fd = dup(other.get_fd()); //, other.get_fd());
   if (!other.is_blocking())
     MakeNonBlocking();
+}
+
+Socket::Socket(Socket&& other) {
+  _fd = dup(other.get_fd()); //, other.get_fd());
+  if (!other.is_blocking())
+    MakeNonBlocking();
+  other._fd = -1;
 }
 
 Socket& Socket::operator=(const Socket& other) {
@@ -105,10 +113,6 @@ ssize_t Socket::Write(const char* data, size_t size) {
   return 0;
 }
 
-ssize_t Socket::Write(const std::vector<char>& vector) {
-  return Write(vector.data(), vector.size());
-}
-
 int Socket::get_fd() const { return _fd; }
 
 void Socket::Close() {
@@ -132,11 +136,38 @@ std::shared_ptr<Socket> Socket::start_socket(int port, int maxConnections) {
 
 bool Socket::is_blocking() const { return _blocking; }
 
+ssize_t Socket::Write(const std::vector<char>& vector) {
+  return Write(vector.data(), vector.size());
+}
+
 ssize_t Socket::Write(const std::string& string) {
   try {
     return Write(string.data(), string.length());
   } catch (std::runtime_error& ex) {
     Log::e(ex.what());
+    throw;
+  }
+}
+
+ssize_t Socket::Write(File& file) {
+  try {
+    auto result =
+        ::sendfile(_fd, file.fd(), nullptr, file.size() - file.offset());
+
+    if (result == -1) {
+      if (!is_blocking()) {
+        if (errno != EAGAIN)
+          throw std::runtime_error("Error when writing to socket with fd = " +
+                                   std::to_string(_fd) + " errno = " +
+                                   std::to_string(errno));
+      }
+    }
+
+    auto correct_offset = file.last_offset() + result;
+    if (correct_offset != file.offset())
+      file.adjust_offset(correct_offset);
+    return result;
+  } catch (std::exception& ex) {
     throw;
   }
 }
