@@ -37,8 +37,7 @@ void IO::OutputScheduler::ScheduleWrite(const IO::Socket& sock,
   add_socket(sock, data);
 }
 
-void IO::OutputScheduler::remove_socket(IO::Socket& sock,
-                                        int position,
+void IO::OutputScheduler::remove_socket(IO::Socket& sock, int position,
                                         epoll_event* ev) {
   epoll_ctl(_efd, EPOLL_CTL_DEL, sock.get_fd(), ev);
   _schedule.erase(_schedule.begin() + position);
@@ -112,16 +111,6 @@ void IO::OutputScheduler::Run() {
     _stopRequested = false;
     while (!_stopRequested) {
       int events_number = GetEvents();
-      //            //Log::i("Will wait until a fd is available for writing");
-      //            do {
-      //                events_number = epoll_wait(_efd, _events.data(), _maxEv,
-      //                -1);
-      //                if (events_number == -1 && errno != EINTR)
-      //                    throw std::runtime_error("Epoll wait error, errno =
-      //                    " + std::to_string(errno));
-      //            }
-      //            while (events_number == -1);
-
       for (auto index = 0; index < events_number; ++index) {
         Log::i("got " + std::to_string(events_number) + " events (writing)");
         if (is_error(_events[index].events)) {
@@ -157,9 +146,6 @@ void IO::OutputScheduler::Run() {
                   _schedule[scheduled_item_pos].data.begin() + written,
                   _schedule[scheduled_item_pos].data.end())
                   .swap(_schedule[scheduled_item_pos].data);
-              //_schedule[scheduled_item_pos].data =
-              //std::vector<char>(_schedule[scheduled_item_pos].data.begin() +
-              //written, _schedule[scheduled_item_pos].data.end());
               auto newSize = _schedule[scheduled_item_pos].data.size();
               assert(oldSize - written == newSize);
             } else {
@@ -172,14 +158,13 @@ void IO::OutputScheduler::Run() {
     }
   } catch (std::exception& ex) {
     throw;
-    }
+  }
 }
 
 std::unique_ptr<IO::OutputScheduler> IO::OutputScheduler::_instance;
 
-IO::OutputScheduler &IO::OutputScheduler::get()
-{
-    if(_instance.get() == nullptr)
-       _instance.reset(new OutputScheduler(Storage::settings().max_connections));
-    return (*_instance);
+IO::OutputScheduler& IO::OutputScheduler::get() {
+  if (_instance.get() == nullptr)
+    _instance.reset(new OutputScheduler(Storage::settings().max_connections));
+  return (*_instance);
 }

@@ -11,7 +11,7 @@
 #include "components.h"
 #include "cachemanager.h"
 
-std::map<std::string, std::function<Http::Response(Http::Request)>>
+std::map<std::string, std::function<Http::Response(Http::Request)> >
     Web::Dispatcher::routes;
 
 using namespace Web;
@@ -30,20 +30,20 @@ bool Dispatcher::Dispatch(IO::Socket& connection) {
           return response.should_close();
         } else {
           // no user-defined handler, return not found
-          ResponseManager::Respond({request, 404}, connection);
+          ResponseManager::Respond({ request, 404 }, connection);
           return true;
         }
       } else {
         // it's a resource
         try {
           auto&& resource = CacheManager::GetResource(request.URI.c_str());
-          Http::Response resp{request, resource};
+          Http::Response resp{ request, resource };
           resp.setContent_type(
               Http::Parser::GetMimeTypeByExtension(request.URI));
           ResponseManager::Respond(resp, connection);
           return resp.should_close();
         } catch (int code) {
-          ResponseManager::Respond({request, code}, connection);
+          ResponseManager::Respond({ request, code }, connection);
           return false;
         }
       }

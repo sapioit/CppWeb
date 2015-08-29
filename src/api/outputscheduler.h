@@ -33,7 +33,8 @@ class OutputScheduler {
   bool _stopRequested = true;
 
   static std::unique_ptr<OutputScheduler> _instance;
- public:
+
+public:
   OutputScheduler(int max_events);
   void ScheduleWrite(const Socket&, const std::string&);
   void Run();
@@ -42,4 +43,4 @@ class OutputScheduler {
 };
 };
 
-#endif  // OSCHEDULER_H
+#endif // OSCHEDULER_H

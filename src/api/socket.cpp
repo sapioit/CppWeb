@@ -24,17 +24,16 @@ Socket::Socket(std::uint16_t port) : _port(port) {
   _address.sin_port = htons(port);
 }
 
-Socket::Socket(int fd, bool connection) : _fd(fd), _connection(connection) {
-}
+Socket::Socket(int fd, bool connection) : _fd(fd), _connection(connection) {}
 
 Socket::Socket(const Socket& other) {
-  _fd = dup(other.get_fd());  //, other.get_fd());
+  _fd = dup(other.get_fd()); //, other.get_fd());
   if (!other.is_blocking())
     MakeNonBlocking();
 }
 
 Socket& Socket::operator=(const Socket& other) {
-  _fd = dup(other.get_fd());  //, other.get_fd());
+  _fd = dup(other.get_fd()); //, other.get_fd());
   if (!other.is_blocking())
     MakeNonBlocking();
 
@@ -109,18 +108,14 @@ ssize_t Socket::Write(const std::vector<char>& vector) {
   return Write(vector.data(), vector.size());
 }
 
-int Socket::get_fd() const {
-  return _fd;
-}
+int Socket::get_fd() const { return _fd; }
 
 void Socket::Close() {
   if (_fd != -1)
     ::close(_fd);
 }
 
-Socket::~Socket() {
-  Close();
-}
+Socket::~Socket() { Close(); }
 
 std::shared_ptr<Socket> Socket::start_socket(int port, int maxConnections) {
   try {
@@ -134,9 +129,7 @@ std::shared_ptr<Socket> Socket::start_socket(int port, int maxConnections) {
   }
 }
 
-bool Socket::is_blocking() const {
-  return _blocking;
-}
+bool Socket::is_blocking() const { return _blocking; }
 
 ssize_t Socket::Write(const std::string& string) {
   try {
@@ -153,18 +146,11 @@ bool Socket::WasShutDown() {
   return bytesRead == 0;
 }
 
-bool Socket::operator<(const Socket& other) {
-  return _reads < other._reads;
-}
-std::uint64_t Socket::getReads() const {
-  return _reads;
-}
-bool Socket::getConnection() const {
-  return _connection;
-}
+bool Socket::operator<(const Socket& other) { return _reads < other._reads; }
+std::uint64_t Socket::getReads() const { return _reads; }
+bool Socket::getConnection() const { return _connection; }
 
-template <class T>
-T Socket::Read(std::size_t size) {
+template <class T> T Socket::Read(std::size_t size) {
   T result;
 
   try {
@@ -189,12 +175,12 @@ T Socket::Read(std::size_t size) {
       result.resize(available);
       ssize_t readBytes = ::read(_fd, &result.front(), available);
       if (available != readBytes)
-        throw std::runtime_error(
-            "Socket read error on fd = " + std::to_string(_fd) +
-            "."
-            "Expected to read " +
-            std::to_string(available) + " bytes, but could only read " +
-            std::to_string(readBytes) + " bytes");
+        throw std::runtime_error("Socket read error on fd = " +
+                                 std::to_string(_fd) + "."
+                                                       "Expected to read " +
+                                 std::to_string(available) +
+                                 " bytes, but could only read " +
+                                 std::to_string(readBytes) + " bytes");
       ++_reads;
       return result;
     } else {
@@ -216,7 +202,7 @@ T Socket::Read(std::size_t size) {
   }
 }
 
-template std::vector<char> Socket::Read<std::vector<char>>(std::size_t = 0);
+template std::vector<char> Socket::Read<std::vector<char> >(std::size_t = 0);
 
 template std::string Socket::Read<std::string>(std::size_t = 0);
 
@@ -240,7 +226,7 @@ std::string Socket::ReadUntil(const std::string& until, bool peek) {
       try {
         if (peek)
           return result.substr(0, position);
-        return Read<std::string>(position);  // result.substr(0, position);
+        return Read<std::string>(position); // result.substr(0, position);
       } catch (std::runtime_error& ex) {
         throw;
       }

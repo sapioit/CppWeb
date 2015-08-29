@@ -8,9 +8,7 @@ void Log::Init(const std::string& fileName) {
   Log::_loggingEnabled = false;
 }
 
-void Log::SetEnabled(bool state) {
-  Log::_loggingEnabled = state;
-}
+void Log::SetEnabled(bool state) { Log::_loggingEnabled = state; }
 
 void Log::i(const std::string& text) {
   if (_loggingEnabled) {

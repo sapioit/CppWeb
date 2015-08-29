@@ -8,22 +8,21 @@
 #include <map>
 #include <utility>
 
-template <class S, class M>
-class DFA {
+template <class S, class M> class DFA {
   std::map<std::pair<S, M>, S> _table;
   std::size_t _it = 0;
   S _currentState;
 
   S _begin, _end;
 
- public:
+public:
   DFA(const S& beginState, const S& endState)
       : _begin(beginState), _end(endState) {
     _currentState = beginState;
   }
 
   void add(const std::pair<S, M>& pair, const S& state) {
-    _table.insert(std::make_pair(pair, state));  // = state;
+    _table.insert(std::make_pair(pair, state)); // = state;
   }
   void transition(const M& token) {
     auto nextState = _table.find(std::make_pair(_currentState, token));
@@ -35,4 +34,4 @@ class DFA {
   const S& currentState() const { return _currentState; }
 };
 
-#endif  // SOCKET_DFA_H
+#endif // SOCKET_DFA_H

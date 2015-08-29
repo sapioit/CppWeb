@@ -37,7 +37,7 @@ int main() {
 
           root.append(records);
 
-          return {req, root};
+          return { req, root };
         }));
 
     Web::Dispatcher::routes.insert(std::make_pair(
@@ -49,18 +49,18 @@ int main() {
           Json::Value a1(Json::arrayValue);
           decltype(a1) a2(Json::arrayValue);
 
-          a1.append({"1"});
-          a1.append({"2"});
+          a1.append({ "1" });
+          a1.append({ "2" });
 
-          a2.append({"3"});
-          a2.append({"4"});
+          a2.append({ "3" });
+          a2.append({ "4" });
 
           records.append(a1);
           records.append(a2);
 
           root.append(records);
 
-          return {req, root};
+          return { req, root };
         }));
     Settings settings;
 #ifndef __arm__

@@ -10,7 +10,7 @@
 
 namespace Http {
 class Response {
- public:
+public:
   Response();
   Response(const Request&);
   Response(const Request&, int);
@@ -45,7 +45,7 @@ class Response {
   std::string getText() const;
   void setText(const std::string& text);
 
- private:
+private:
   Request _request;
   Resource _resource;
   int _code;
@@ -54,4 +54,4 @@ class Response {
 };
 };
 
-#endif  // RESPONSE_H
+#endif // RESPONSE_H

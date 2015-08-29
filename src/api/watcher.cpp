@@ -27,9 +27,7 @@ Watcher::Watcher(std::shared_ptr<Socket> socket, int maxEvents)
   _events.resize(_maxEvents);
 }
 
-void Watcher::Stop() {
-  _stopRequested = true;
-}
+void Watcher::Stop() { _stopRequested = true; }
 
 void Watcher::Close(int fd) {
   struct epoll_event* ev = nullptr;
@@ -61,17 +59,15 @@ Watcher::~Watcher() {
   for (auto& event : _events)
     ::close(event.data.fd);
 }
-bool Watcher::stopRequested() const {
-  return _stopRequested;
-}
+bool Watcher::stopRequested() const { return _stopRequested; }
 
 void Watcher::setStopRequested(bool stopRequested) {
   _stopRequested = stopRequested;
 }
 
-std::vector<std::shared_ptr<Socket>> Watcher::Watch() {
+std::vector<std::shared_ptr<Socket> > Watcher::Watch() {
   int events_number;
-  std::vector<std::shared_ptr<Socket>> result;
+  std::vector<std::shared_ptr<Socket> > result;
   _events.resize(_maxEvents);
   do {
     events_number = epoll_wait(_efd, _events.data(), _maxEvents, -1);
@@ -166,7 +162,7 @@ void Watcher::Start(std::function<void(std::shared_ptr<Socket>)> callback) {
 }
 
 void Watcher::Start(
-    std::function<void(std::vector<std::shared_ptr<Socket>>)> callback) {
+    std::function<void(std::vector<std::shared_ptr<Socket> >)> callback) {
   try {
     while (!stopRequested()) {
       auto sockets_with_activity = Watch();

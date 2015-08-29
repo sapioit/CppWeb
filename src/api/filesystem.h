@@ -15,10 +15,10 @@ struct fs_error : public std::runtime_error {
 };
 
 class FileSystem {
- public:
+public:
   static std::vector<char> ReadFile(const std::string& path);
   static std::string GetCurrentDirectory();
 };
 };
 
-#endif  // FILE_H
+#endif // FILE_H

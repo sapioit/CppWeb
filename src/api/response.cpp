@@ -9,13 +9,9 @@
 #include <utility>
 using namespace Http;
 
-int Response::code() const {
-  return _code;
-}
+int Response::code() const { return _code; }
 
-void Response::setCode(int code) {
-  _code = code;
-}
+void Response::setCode(int code) { _code = code; }
 const Components::ContentType& Response::getContent_type() const {
   return _content_type;
 }
@@ -154,16 +150,10 @@ std::string Response::str() const {
   return stream.str();
 }
 
-const Request& Response::getRequest() const {
-  return _request;
-}
-std::string Response::getText() const {
-  return _text;
-}
+const Request& Response::getRequest() const { return _request; }
+std::string Response::getText() const { return _text; }
 
-void Response::setText(const std::string& text) {
-  _text = text;
-}
+void Response::setText(const std::string& text) { _text = text; }
 
 bool Response::should_cache() const {
   if (has_resource())
@@ -171,9 +161,7 @@ bool Response::should_cache() const {
   return false;
 }
 
-uint32_t Response::get_expiry() const {
-  return 60;
-}
+uint32_t Response::get_expiry() const { return 60; }
 
 bool Response::should_close() const {
   auto connection = _request.header.fields.find(Header::Fields::Connection);
@@ -190,9 +178,7 @@ bool Response::has_body() const {
   return _text.size() || _resource.content().size();
 }
 
-bool Response::has_resource() const {
-  return _resource.content().size();
-}
+bool Response::has_resource() const { return _resource.content().size(); }
 
 bool Response::is_error() const {
   Components::StatusCode s_code = static_cast<Components::StatusCode>(code());
@@ -205,39 +191,28 @@ bool Response::is_error() const {
   return false;
 }
 
-const Resource& Response::getResource() const {
-  return _resource;
-}
+const Resource& Response::getResource() const { return _resource; }
 
-void Response::setResource(const Resource& resource) {
-  _resource = resource;
-}
+void Response::setResource(const Resource& resource) { _resource = resource; }
 
-Response::Response() {
-}
+Response::Response() {}
 
-Response::Response(const Request& request) : _request(request) {
-}
+Response::Response(const Request& request) : _request(request) {}
 
 Response::Response(const Request& request, int code)
-    : _request(request), _code(code) {
-}
+    : _request(request), _code(code) {}
 
 Response::Response(const Request& request, const std::string& text)
-    : _request(request), _code(200), _text(text) {
-}
+    : _request(request), _code(200), _text(text) {}
 
 Response::Response(const Request& request, int code, const std::string& text)
-    : _request(request), _code(code), _text(text) {
-}
+    : _request(request), _code(code), _text(text) {}
 
 Response::Response(const Request& request, const Resource& resource)
-    : _request(request), _resource(resource), _code(200) {
-}
+    : _request(request), _resource(resource), _code(200) {}
 
 Response::Response(const Request& request, const Json::Value& json)
     : _request(request),
       _code(200),
       _text(json.toStyledString()),
-      _content_type(Components::ContentType::ApplicationJson) {
-}
+      _content_type(Components::ContentType::ApplicationJson) {}

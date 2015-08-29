@@ -10,6 +10,6 @@ void ResponseManager::Respond(Http::Response response, IO::Socket& socket) {
     IO::OutputScheduler::get().ScheduleWrite(socket, std::move(raw_response));
   } catch (std::exception& ex) {
     Log::e(ex.what());
-    ResponseManager::Respond({response.getRequest(), 500}, socket);
+    ResponseManager::Respond({ response.getRequest(), 500 }, socket);
   }
 }

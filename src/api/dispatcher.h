@@ -10,8 +10,8 @@
 #include "global.h"
 namespace Web {
 class Dispatcher {
- public:
-  static std::map<std::string, std::function<Http::Response(Http::Request)>>
+public:
+  static std::map<std::string, std::function<Http::Response(Http::Request)> >
       routes;
   static bool Dispatch(IO::Socket& connection);
   static void PassToUser(
@@ -21,4 +21,4 @@ class Dispatcher {
 };
 }
 
-#endif  // DISPATCHER_H
+#endif // DISPATCHER_H
