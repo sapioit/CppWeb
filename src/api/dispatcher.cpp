@@ -1,13 +1,13 @@
 #include <thread>
 #include <sstream>
 #include "dispatcher.h"
-#include "parser.h"
+#include "Parser.h"
 #include "routeutility.h"
 #include "global.h"
 #include "log.h"
 #include "responsemanager.h"
 #include "storage.h"
-#include "parser.h"
+#include "Parser.h"
 #include "components.h"
 
 std::map<std::string, std::function<Http::Response(Http::Request)>>

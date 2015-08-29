@@ -2,7 +2,7 @@
 // Created by Vladimir on 8/2/2015.
 //
 
-#include "watcher.h"
+#include "Watcher.h"
 #include <algorithm>
 #include <assert.h>
 #include <iostream>

@@ -1,7 +1,7 @@
 #include <map>
 #include "server.h"
-#include "watcher.h"
-#include "parser.h"
+#include "Watcher.h"
+#include "Parser.h"
 #include "dispatcher.h"
 #include "storage.h"
 #include <utility>
