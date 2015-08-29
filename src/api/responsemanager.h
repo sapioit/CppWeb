@@ -2,8 +2,8 @@
 #define RESPONSEMANAGER_H
 
 #include "response.h"
-#include "request.h"
-#include "socket.h"
+#include "Request.h"
+#include "Socket.h"
 
 class ResponseManager {
  public:

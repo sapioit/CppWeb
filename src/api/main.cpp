@@ -1,7 +1,7 @@
-#include "socket.h"
-#include "watcher.h"
-#include "request.h"
-#include "parser.h"
+#include "Socket.h"
+#include "Watcher.h"
+#include "Request.h"
+#include "Parser.h"
 #include "server.h"
 #include "dispatcher.h"
 #include "response.h"
@@ -65,7 +65,7 @@ int main() {
     Settings settings;
 #ifndef __arm__
     settings.root_path =
-        "/mnt/rpi/"
+        "/run/user/1000/gvfs/smb-share:server=192.168.2.103,share=backup/"
         "server";
 #else
     settings.root_path = "/mnt/exthdd/server";

@@ -1,7 +1,7 @@
 #include <map>
 #include "server.h"
-#include "watcher.h"
-#include "parser.h"
+#include "Watcher.h"
+#include "Parser.h"
 #include "dispatcher.h"
 #include "storage.h"
 #include <utility>
@@ -13,7 +13,6 @@
 #include <regex>
 #define USE_GLOBAL_DEFINES
 #include "global.h"
-#include "outputscheduler.h"
 
 using namespace Web;
 
@@ -41,8 +40,8 @@ void Server::run()
         _masterSocket = IO::Socket::start_socket(_port, _maxPending);
         IO::Watcher _master_listener(_masterSocket, _maxPending);
 
-//        /Storage::InitializeOutputScheduler(_maxPending);
-        IO::OutputScheduler &output_scheduler = IO::OutputScheduler::get();
+        Storage::InitializeOutputScheduler(_maxPending);
+        IO::OutputScheduler &output_scheduler = Storage::output_scheduler();
         std::thread output_thread(&IO::OutputScheduler::Run, std::ref(output_scheduler));
 
         output_thread.detach();
