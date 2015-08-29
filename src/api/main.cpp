@@ -1,13 +1,10 @@
-#include "socket.h"
-#include "watcher.h"
-#include "request.h"
-#include "parser.h"
-#include "server.h"
-#include "dispatcher.h"
-#include "response.h"
-#include <iostream>
-#include "json.h"
+#include <server/server.h>
+#include <server/dispatcher.h>
+#include <http/response.h>
+#include <http/request.h>
+#include <json/json.h>
 
+#include <iostream>
 int main() {
   try {
     Web::Server s(1234);
@@ -65,7 +62,7 @@ int main() {
     Settings settings;
 #ifndef __arm__
     settings.root_path =
-        "/run/user/1000/gvfs/smb-share:server=192.168.2.103,share=backup/"
+        "/mnt/rpi/"
         "server";
 #else
     settings.root_path = "/mnt/exthdd/server";
