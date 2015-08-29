@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <memory>
-#include "Socket.h"
+#include "socket.h"
 #include <fstream>
 #include "settings.h"
 #include "log.h"

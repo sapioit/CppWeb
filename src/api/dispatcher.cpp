@@ -1,14 +1,15 @@
 #include <thread>
 #include <sstream>
 #include "dispatcher.h"
-#include "Parser.h"
+#include "parser.h"
 #include "routeutility.h"
 #include "global.h"
 #include "log.h"
 #include "responsemanager.h"
 #include "storage.h"
-#include "Parser.h"
+#include "parser.h"
 #include "components.h"
+#include "cachemanager.h"
 
 std::map<std::string, std::function<Http::Response(Http::Request)>>
     Web::Dispatcher::routes;
@@ -35,7 +36,7 @@ bool Dispatcher::Dispatch(IO::Socket& connection) {
       } else {
         // it's a resource
         try {
-          auto&& resource = Storage::GetResource(request.URI.c_str());
+          auto&& resource = CacheManager::GetResource(request.URI.c_str());
           Http::Response resp{request, resource};
           resp.setContent_type(
               Http::Parser::GetMimeTypeByExtension(request.URI));
