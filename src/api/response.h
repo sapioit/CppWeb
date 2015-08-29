@@ -3,9 +3,9 @@
 
 #include <string>
 #include <iostream>
-#include "Header.h"
+#include "header.h"
 #include "resource.h"
-#include "Request.h"
+#include "request.h"
 #include "json.h"
 
 namespace Http {

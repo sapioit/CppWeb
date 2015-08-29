@@ -1,7 +1,7 @@
 #ifndef OSCHEDULER_H
 #define OSCHEDULER_H
 #include <queue>
-#include "Socket.h"
+#include "socket.h"
 #include <sys/epoll.h>
 #include <mutex>
 

@@ -2,7 +2,7 @@
 // Created by vladimir on 09.08.2015.
 //
 
-#include "Parser.h"
+#include "parser.h"
 #include "log.h"
 #include "components.h"
 #include <cassert>

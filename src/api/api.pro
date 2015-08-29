@@ -22,7 +22,7 @@ SOURCES += \
     dispatcher.cpp \
     responsemanager.cpp \
     routeutility.cpp \
-    Parser.cpp \
+    parser.cpp \
     log.cpp \
     storage.cpp \
     cachemanager.cpp \
@@ -32,27 +32,27 @@ SOURCES += \
     settings.cpp
 
 SOURCES += \
-    DFA.cpp \
+    dfa.cpp \
     main.cpp \
-    Request.cpp \
-    Socket.cpp \
-    Watcher.cpp \
+    request.cpp \
+    socket.cpp \
+    watcher.cpp \
     response.cpp \
     jsoncpp.cpp \
 
 HEADERS += \
-    DFA.h \
-    Header.h \
-    Request.h \
-    Socket.h \
-    Watcher.h \
+    dfa.h \
+    header.h \
+    request.h \
+    socket.h \
+    watcher.h \
     response.h \
     server.h \
     dispatcher.h \
     global.h \
     responsemanager.h \
     routeutility.h \
-    Parser.h \
+    parser.h \
     date.h \
     log.h \
     storage.h \
