@@ -4,6 +4,7 @@
 #include "socket.h"
 #include <sys/epoll.h>
 #include <mutex>
+#include <memory>
 
 namespace IO {
 class OutputScheduler {
@@ -31,11 +32,13 @@ class OutputScheduler {
   int _efd, _maxEv;
   bool _stopRequested = true;
 
+  static std::unique_ptr<OutputScheduler> _instance;
  public:
   OutputScheduler(int max_events);
   void ScheduleWrite(const Socket&, const std::string&);
   void Run();
   void Stop() { _stopRequested = true; }
+  static OutputScheduler& get();
 };
 };
 

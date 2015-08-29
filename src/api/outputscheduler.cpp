@@ -6,6 +6,7 @@
 #include <sys/types.h>
 #include <cassert>
 #include <sys/socket.h>
+#include "storage.h"
 
 inline void IO::OutputScheduler::add_socket(const IO::Socket& sock,
                                             const std::string& data) {
@@ -171,5 +172,14 @@ void IO::OutputScheduler::Run() {
     }
   } catch (std::exception& ex) {
     throw;
-  }
+    }
+}
+
+std::unique_ptr<IO::OutputScheduler> IO::OutputScheduler::_instance;
+
+IO::OutputScheduler &IO::OutputScheduler::get()
+{
+    if(_instance.get() == nullptr)
+       _instance.reset(new OutputScheduler(Storage::settings().max_connections));
+    return (*_instance);
 }

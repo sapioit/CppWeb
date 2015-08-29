@@ -11,6 +11,7 @@
 #include <thread>
 #include <future>
 #include <regex>
+#include "outputscheduler.h"
 #define USE_GLOBAL_DEFINES
 #include "global.h"
 
@@ -40,8 +41,7 @@ void Server::run()
         _masterSocket = IO::Socket::start_socket(_port, _maxPending);
         IO::Watcher _master_listener(_masterSocket, _maxPending);
 
-        Storage::InitializeOutputScheduler(_maxPending);
-        IO::OutputScheduler &output_scheduler = Storage::output_scheduler();
+        IO::OutputScheduler &output_scheduler = IO::OutputScheduler::get();
         std::thread output_thread(&IO::OutputScheduler::Run, std::ref(output_scheduler));
 
         output_thread.detach();
