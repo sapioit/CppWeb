@@ -5,7 +5,7 @@
 #ifndef SOCKET_OBSERVER_H
 #define SOCKET_OBSERVER_H
 
-#include "Socket.h"
+#include "socket.h"
 #include <sys/epoll.h>
 #include <memory>
 #include <vector>

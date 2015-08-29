@@ -1,10 +1,10 @@
 #include "response.h"
-#include "Request.h"
+#include "request.h"
 #include "date.h"
 #include <iomanip>
 #include <iterator>
 #include "log.h"
-#include "DFA.h"
+#include "dfa.h"
 #include <sstream>
 #include <utility>
 using namespace Http;

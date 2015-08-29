@@ -5,8 +5,8 @@
 #ifndef SOCKET_REQUEST_H
 #define SOCKET_REQUEST_H
 
-#include "Header.h"
-#include "Socket.h"
+#include "header.h"
+#include "socket.h"
 #include "components.h"
 #include <string>
 #include <map>

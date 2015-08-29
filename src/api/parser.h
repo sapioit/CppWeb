@@ -5,8 +5,8 @@
 #ifndef SOCKET_HTTPUTILITY_H
 #define SOCKET_HTTPUTILITY_H
 
-#include "Socket.h"
-#include "Request.h"
+#include "socket.h"
+#include "request.h"
 
 namespace Http {
 class Parser {
