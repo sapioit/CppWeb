@@ -68,6 +68,7 @@ void Socket::MakeNonBlocking() {
   if (result == -1)
     throw std::runtime_error(
         "Could not set the non-blocking flag for the file descriptor");
+
 }
 
 std::shared_ptr<Socket> Socket::Accept() {
@@ -92,7 +93,7 @@ std::shared_ptr<Socket> Socket::Accept() {
 }
 
 ssize_t Socket::Write(const char* data, size_t size) {
-  auto bytesWritten = ::write(_fd, static_cast<const void*>(data), size);
+  auto bytesWritten = ::send(_fd, static_cast<const void*>(data), size, MSG_NOSIGNAL);
   if (bytesWritten == -1) {
     //        if (!(((errno == EAGAIN) || (errno == EWOULDBLOCK)) && _blocking))
     //        {

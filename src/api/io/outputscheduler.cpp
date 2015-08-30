@@ -113,12 +113,12 @@ void IO::OutputScheduler::Run() {
     while (!_stopRequested) {
       int events_number = GetEvents();
       for (auto index = 0; index < events_number; ++index) {
+          volatile std::lock_guard<std::mutex> schedule_lock(_scheduling_mutex);
         Log::i("got " + std::to_string(events_number) + " events (writing)");
         if (is_error(_events[index].events)) {
           log_error(_efd);
           remove_socket(_events[index].data.fd);
         } else {
-          volatile std::lock_guard<std::mutex> schedule_lock(_scheduling_mutex);
 
           std::size_t err_pos = static_cast<std::size_t>(-1);
           std::size_t scheduled_item_pos = err_pos;
@@ -150,8 +150,7 @@ void IO::OutputScheduler::Run() {
               auto newSize = _schedule[scheduled_item_pos].data.size();
               assert(oldSize - written == newSize);
             } else {
-              _schedule[scheduled_item_pos].data.clear();
-              _schedule[scheduled_item_pos].data.shrink_to_fit();
+              _schedule[scheduled_item_pos].data = {};
             }
           }
         }
