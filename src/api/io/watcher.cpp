@@ -30,7 +30,7 @@ Watcher::Watcher(std::shared_ptr<Socket> socket, int maxEvents)
 
 void Watcher::Stop() { _stopRequested = true; }
 
-void Watcher::Close(int fd) {
+void Watcher::RemoveSocket(int fd) {
   struct epoll_event* ev = nullptr;
   for (auto& event : _events) {
     if (event.data.fd == fd) {
@@ -52,8 +52,8 @@ void Watcher::Close(int fd) {
   }
 }
 
-void Watcher::Close(std::shared_ptr<Socket> sock) {
-  Watcher::Close((*sock).get_fd());
+void Watcher::RemoveSocket(std::shared_ptr<Socket> sock) {
+  Watcher::RemoveSocket((*sock).get_fd());
 }
 
 Watcher::~Watcher() {
@@ -99,7 +99,7 @@ std::vector<std::shared_ptr<Socket> > Watcher::Watch() {
     }
 
     if (_events[index].events & EPOLLRDHUP)
-      Close(_events[index].data.fd);
+      RemoveSocket(_events[index].data.fd);
 
     if ((*_socket).get_fd() == _events[index].data.fd) {
       /* the listening socket received something,

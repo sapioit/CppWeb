@@ -49,7 +49,7 @@ void Server::run() {
                    " connections");
             bool should_close = Dispatcher::Dispatch((*sock));
             if (should_close)
-              _master_listener.Close(sock);
+              _master_listener.RemoveSocket(sock);
           }
         });
 

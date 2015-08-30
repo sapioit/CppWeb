@@ -16,8 +16,8 @@ public:
   Watcher(std::shared_ptr<Socket>, int);
   ~Watcher();
   void Stop();
-  void Close(int);
-  void Close(std::shared_ptr<IO::Socket>);
+  void RemoveSocket(int);
+  void RemoveSocket(std::shared_ptr<IO::Socket>);
   void Start(std::function<void(std::shared_ptr<Socket>)>);
   void Start(std::function<void(std::vector<std::shared_ptr<Socket> >)>);
 
