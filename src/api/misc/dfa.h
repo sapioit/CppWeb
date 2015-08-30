@@ -9,6 +9,7 @@
 #include <utility>
 
 template <class S, class T> class DFA {
+protected:
   std::map<std::pair<S, T>, S> _table;
   std::size_t _it = 0;
   S _currentState;
@@ -16,6 +17,8 @@ template <class S, class T> class DFA {
   S _begin, _end;
 
 public:
+  const S& currentState() const { return _currentState; }
+  const S& finalState() const { return _end; }
   DFA() {}
   DFA(const S& beginState, const S& endState)
       : _begin(beginState), _end(endState) {
@@ -23,8 +26,8 @@ public:
   }
   DFA(const DFA&) = default;
   DFA(DFA&&) = default;
-  DFA& operator=(const DFA&) = default;
-  ~DFA() = default;
+  virtual DFA& operator=(const DFA&) = default;
+  virtual ~DFA() = default;
 
   void add(const std::pair<S, T>& pair, const S& state) {
     _table.insert(std::make_pair(pair, state)); // = state;
@@ -36,7 +39,6 @@ public:
     _currentState = nextState->second;
   }
 
-  const S& currentState() const { return _currentState; }
 };
 
 #endif // SOCKET_DFA_H

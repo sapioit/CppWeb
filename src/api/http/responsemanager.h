@@ -5,7 +5,7 @@
 #include <http/request.h>
 #include <io/socket.h>
 
-class ResponseManager {
+class ResponseBuilder {
 public:
   static void Respond(Http::Response, IO::Socket&);
 };

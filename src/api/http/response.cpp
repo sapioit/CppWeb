@@ -54,7 +54,8 @@ DFA<states, transitions> make_machine() {
       states::ResponseHeader);
   machine.add(
       std::make_pair(states::ResponseHeader, transitions::EndResponseHeader),
-      states::CRLFHeader);
+      states::End);
+              //states::CRLFHeader);
   machine.add(std::make_pair(states::CRLFHeader, transitions::CRLFEnd),
               states::Body);
   machine.add(std::make_pair(states::Body, transitions::EndBody),
@@ -64,7 +65,7 @@ DFA<states, transitions> make_machine() {
   return machine;
 }
 
-std::string Response::str() const {
+std::string Response::str_header() const {
   std::ostringstream stream;
 
   auto machine = make_machine();
@@ -87,9 +88,6 @@ std::string Response::str() const {
                << " " << Date::Now()() << crlf;
         stream << "Connection: " << (should_close() ? "Close" : "Keep-Alive")
                << crlf;
-        //            if(is_error())
-        //                machine.transition(transitions::Error);
-        //            else
         machine.transition(transitions::EndGeneralHeader);
         break;
       }
@@ -129,22 +127,23 @@ std::string Response::str() const {
         machine.transition(transitions::CRLFEnd);
         break;
       }
-      case states::Body: {
-        if (has_resource()) {
-          std::copy(_resource.content().begin(), _resource.content().end(),
-                    std::ostream_iterator<char>(stream));
-        } else {
-          stream << _text;
-        }
-        stream << crlf;
-        machine.transition(transitions::EndBody);
-        break;
-      }
-      case states::CRLFBody: {
-        stream << crlf;
-        machine.transition(transitions::CRLFEnd);
-        break;
-      }
+
+//      case states::Body: {
+//        if (has_resource()) {
+//          std::copy(_resource.content().begin(), _resource.content().end(),
+//                    std::ostream_iterator<char>(stream));
+//        } else {
+//          stream << _text;
+//        }
+//        stream << crlf;
+//        machine.transition(transitions::EndBody);
+//        break;
+//      }
+//      case states::CRLFBody: {
+//        stream << crlf;
+//        machine.transition(transitions::CRLFEnd);
+//        break;
+//      }
       default: { break; }
     }
   }

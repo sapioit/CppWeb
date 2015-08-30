@@ -20,7 +20,7 @@ std::mutex Log::mLock;
 std::string Log::_fn;
 Server::Server(int port) : _port(port) {
   Log::Init("log_file.txt");
-  Log::SetEnabled(false);
+  Log::SetEnabled(true);
   Log::i("Started logging");
   setSettings({});
 }
@@ -45,8 +45,6 @@ void Server::run() {
     _master_listener.Start(
         [&](std::vector<std::shared_ptr<IO::Socket> > sockets) {
           for (auto& sock : sockets) {
-            Log::i("Will dispatch " + std::to_string(sockets.size()) +
-                   " connections");
             bool should_close = Dispatcher::Dispatch((*sock));
             if (should_close)
               _master_listener.Close(sock);

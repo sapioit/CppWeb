@@ -13,7 +13,7 @@ QMAKE_CXXFLAGS += -Wall
 QMAKE_CXXFLAGS += -Ijson/
 DEFINES += API_LIBRARY
 
-QMAKE_CXXFLAGS_DEBUG += -O0 -g3
+QMAKE_CXXFLAGS_DEBUG += -O0 -g
 QMAKE_CXXFLAGS_RELEASE -= -O2
 QMAKE_CXXFLAGS_RELEASE += -O3
 
@@ -25,7 +25,8 @@ SOURCES += \
     http/request.cpp \
     http/response.cpp \
     http/responsemanager.cpp \
-    http/routeutility.cpp
+    http/routeutility.cpp \
+    io/scheduled_write.cpp
 
 HEADERS += \
     http/cachemanager.h \

@@ -26,11 +26,11 @@ bool Dispatcher::Dispatch(IO::Socket& connection) {
           request.setUri_components(
               Http::Parser::Split(Http::Parser::StripRoute(request.URI), '/'));
           auto response = handler(request);
-          ResponseManager::Respond(response, connection);
+          ResponseBuilder::Respond(response, connection);
           return response.should_close();
         } else {
           // no user-defined handler, return not found
-          ResponseManager::Respond({ request, 404 }, connection);
+          ResponseBuilder::Respond({ request, 404 }, connection);
           return true;
         }
       } else {
@@ -40,10 +40,10 @@ bool Dispatcher::Dispatch(IO::Socket& connection) {
           Http::Response resp{ request, resource };
           resp.setContent_type(
               Http::Parser::GetMimeTypeByExtension(request.URI));
-          ResponseManager::Respond(resp, connection);
+          ResponseBuilder::Respond(resp, connection);
           return resp.should_close();
         } catch (int code) {
-          ResponseManager::Respond({ request, code }, connection);
+          ResponseBuilder::Respond({ request, code }, connection);
           return false;
         }
       }
@@ -61,5 +61,5 @@ void Dispatcher::PassToUser(
     std::function<Http::Response(Http::Request)> user_handler,
     IO::Socket& socket) {
   auto response = user_handler(request);
-  ResponseManager::Respond(std::move(response), socket);
+  ResponseBuilder::Respond(std::move(response), socket);
 }

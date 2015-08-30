@@ -40,7 +40,7 @@ public:
   const Resource& getResource() const;
   void setResource(const Resource& resource);
 
-  std::string str() const;
+  std::string str_header() const;
   const Request& getRequest() const;
 
   std::string getText() const;
