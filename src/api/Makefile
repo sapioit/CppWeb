@@ -1,45 +1,45 @@
 # Compiler
-CC = g++
-OPTS = -fPIC -std=c++14 -O3 -g0 -Wall -D_REENTRANT -I./json/
+CC = clang++
+OPTS = -fPIC -std=c++14 -O3 -g -Wall -D_REENTRANT -march=native
+DEBUGOPTS = 
+INCLUDEDIRS = -I.
 
 # Project name
-PROJECT = server
-LIBNAME = libcppserver
-
-# Directories
-OBJDIR = obj
-SRCDIR = .
+PROJECT = srv
 
 # Libraries
 LIBS = -lpthread
 LDFLAGS = -shared
 
 # Files and folders
-SRCS    = $(shell find $(SRCDIR) -name '*.cpp')
-SRCDIRS = $(shell find . -name '*.cpp' | dirname {} | sort | uniq | sed 's/\/$(SRCDIR)//g' )
-OBJS    = $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.o,$(SRCS))
+OBJS    = main.o cachemanager.o parser.o request.o response.o responsemanager.o routeutility.o filesystem.o \
+	outputscheduler.o socket.o watcher.o jsoncpp.o dfa.o log.o resource.o settings.o storage.o dispatcher.o \
+	server.o
 
 # Targets
-$(PROJECT): buildrepo $(OBJS)
-	$(CC) $(OBJS) $(LIBS) -o $@
+$(PROJECT): $(OBJS)
+	$(CC) $(OPTS) $(DEBUGOPTS) $(LIBS) $^ -o $@
 
-$(OBJDIR)/%.o: $(SRCDIR)/%.cpp
-	$(CC) $(OPTS) -c $< -o $@
+%.o : %.cpp
+	$(CC) -c $(OPTS) $(DEBUGOPTS) $(INCLUDEDIRS) $< -o $@
 	
+%.o : http/%.cpp
+	$(CC) -c $(OPTS) $(DEBUGOPTS) $(INCLUDEDIRS) $< -o $@
+
+%.o : io/%.cpp
+	$(CC) -c $(OPTS) $(DEBUGOPTS) $(INCLUDEDIRS) $< -o $@
+	
+%.o : json/%.cpp
+	$(CC) -c $(OPTS) $(DEBUGOPTS) $(INCLUDEDIRS) $< -o $@
+	
+%.o : misc/%.cpp
+	$(CC) -c $(OPTS) $(DEBUGOPTS) $(INCLUDEDIRS) $< -o $@
+	
+%.o : server/%.cpp
+	$(CC) -c $(OPTS) $(DEBUGOPTS) $(INCLUDEDIRS) $< -o $@
+
 clean:
-	rm $(PROJECT) $(OBJDIR) $(LIBNAME).so -Rf
+	rm *.o $(PROJECT) -Rf
 
 lib:
 	$(CC) $(OBJS) $(LIBS) $(LDFLAGS) -o $(LIBNAME).so
-	
-buildrepo:
-	@$(call make-repo)
-
-# Create obj directory structure
-define make-repo
-	mkdir -p $(OBJDIR)
-	for dir in $(SRCDIRS); \
-	do \
-		mkdir -p $(OBJDIR)/$$dir; \
-	done
-endef
