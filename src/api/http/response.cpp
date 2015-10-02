@@ -78,7 +78,8 @@ std::string Response::str() const {
         stream << "HTTP/" << std::setprecision(2) << 1.1;
         stream << " " << code() << " ";
         stream << Components::status_codes.at(
-                      static_cast<Components::StatusCode>(code())) << crlf;
+                      static_cast<Components::StatusCode>(code()))
+               << crlf;
         machine.transition(transitions::EndStatusLine);
         break;
       }
@@ -95,8 +96,7 @@ std::string Response::str() const {
       }
       case states::ResponseHeader: {
         auto type_str_it = mime_types.find(getContent_type());
-        if (type_str_it == mime_types.end())
-          throw 415;
+        if (type_str_it == mime_types.end()) throw 415;
         std::string type_str(type_str_it->second);
         stream << Http::Header::Fields::Content_Type << ": " << type_str
                << crlf;
@@ -108,7 +108,8 @@ std::string Response::str() const {
         stream << crlf;
         stream << Http::Header::Fields::Cache_Control << ": "
                << (should_cache() ? "max-age=" + std::to_string(get_expiry())
-                                  : "no-cache") << crlf;
+                                  : "no-cache")
+               << crlf;
         if (has_resource()) {
           if (getContent_type() == Components::ContentType::TextHtml ||
               getContent_type() == Components::ContentType::TextPlain) {
@@ -158,8 +159,7 @@ std::string Response::getText() const { return _text; }
 void Response::setText(const std::string& text) { _text = text; }
 
 bool Response::should_cache() const {
-  if (has_resource())
-    return true;
+  if (has_resource()) return true;
   return false;
 }
 
@@ -167,11 +167,9 @@ uint32_t Response::get_expiry() const { return 60; }
 
 bool Response::should_close() const {
   auto connection = _request.header.fields.find(Header::Fields::Connection);
-  if (connection == _request.header.fields.end())
-    return true;
+  if (connection == _request.header.fields.end()) return true;
 
-  if (connection->second == "Keep-Alive")
-    return false;
+  if (connection->second == "Keep-Alive") return false;
 
   return true;
 }

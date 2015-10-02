@@ -14,8 +14,7 @@ std::function<Http::Response(Http::Request)> RouteUtility::GetHandler(
                           std::function<Http::Response(Http::Request)>>& route)
           -> bool {
             auto& method = route.first.first;
-            if (request.method != method)
-              return false;
+            if (request.method != method) return false;
             auto& pattern = route.first.second;
             std::regex regex(pattern);
             return std::regex_match(strippedRoute, regex);

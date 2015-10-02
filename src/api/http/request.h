@@ -18,7 +18,7 @@ class Request {
   std::vector<Components::ContentType> _accepted;
   std::vector<std::string> _uri_components;
 
-public:
+ public:
   Components::Method method;
   Header header;
   std::string URI, body;
@@ -39,4 +39,4 @@ public:
 };
 }
 
-#endif // SOCKET_REQUEST_H
+#endif  // SOCKET_REQUEST_H

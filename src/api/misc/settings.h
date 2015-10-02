@@ -13,4 +13,4 @@ struct Settings {
   int max_connections;
 };
 
-#endif // SETTINGS_H
+#endif  // SETTINGS_H

@@ -12,7 +12,7 @@ namespace Http {
 class Parser {
   IO::Socket& _sock;
 
-public:
+ public:
   Parser(IO::Socket& sock) : _sock(sock) {}
   Request operator()();
   Request Init();
@@ -26,4 +26,4 @@ public:
 };
 };
 
-#endif // SOCKET_HTTPUTILITY_H
+#endif  // SOCKET_HTTPUTILITY_H

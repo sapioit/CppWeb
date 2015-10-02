@@ -6,8 +6,8 @@
 #include <io/socket.h>
 
 class ResponseManager {
-public:
+ public:
   static void Respond(Http::Response, IO::Socket&);
 };
 
-#endif // RESPONSEMANAGER_H
+#endif  // RESPONSEMANAGER_H

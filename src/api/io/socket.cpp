@@ -14,12 +14,10 @@ using namespace IO;
 
 Socket::Socket(std::uint16_t port) : _port(port) {
   _fd = ::socket(AF_INET, SOCK_STREAM, 0);
-  if (_fd == -1)
-    throw std::runtime_error("Could not create socket");
+  if (_fd == -1) throw std::runtime_error("Could not create socket");
   int opt_res;
   opt_res = setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, &_opt, sizeof(_opt));
-  if (opt_res < -1)
-    throw std::runtime_error("Setsockopt error");
+  if (opt_res < -1) throw std::runtime_error("Setsockopt error");
   _address.sin_family = AF_INET;
   _address.sin_addr.s_addr = INADDR_ANY;
   _address.sin_port = htons(port);
@@ -28,15 +26,13 @@ Socket::Socket(std::uint16_t port) : _port(port) {
 Socket::Socket(int fd, bool connection) : _fd(fd), _connection(connection) {}
 
 Socket::Socket(const Socket& other) {
-  _fd = dup(other.get_fd()); //, other.get_fd());
-  if (!other.is_blocking())
-    MakeNonBlocking();
+  _fd = dup(other.get_fd());  //, other.get_fd());
+  if (!other.is_blocking()) MakeNonBlocking();
 }
 
 Socket& Socket::operator=(const Socket& other) {
-  _fd = dup(other.get_fd()); //, other.get_fd());
-  if (!other.is_blocking())
-    MakeNonBlocking();
+  _fd = dup(other.get_fd());  //, other.get_fd());
+  if (!other.is_blocking()) MakeNonBlocking();
 
   return *this;
 }
@@ -54,8 +50,7 @@ void Socket::Bind() {
 
 void Socket::Listen(int pending_max) {
   int listen_result = ::listen(_fd, pending_max);
-  if (listen_result < 0)
-    throw std::runtime_error("Listen failed");
+  if (listen_result < 0) throw std::runtime_error("Listen failed");
 }
 
 void Socket::MakeNonBlocking() {
@@ -68,7 +63,6 @@ void Socket::MakeNonBlocking() {
   if (result == -1)
     throw std::runtime_error(
         "Could not set the non-blocking flag for the file descriptor");
-
 }
 
 std::shared_ptr<Socket> Socket::Accept() {
@@ -93,7 +87,8 @@ std::shared_ptr<Socket> Socket::Accept() {
 }
 
 ssize_t Socket::Write(const char* data, size_t size) {
-  auto bytesWritten = ::send(_fd, static_cast<const void*>(data), size, MSG_NOSIGNAL);
+  auto bytesWritten =
+      ::send(_fd, static_cast<const void*>(data), size, MSG_NOSIGNAL);
   if (bytesWritten == -1) {
     //        if (!(((errno == EAGAIN) || (errno == EWOULDBLOCK)) && _blocking))
     //        {
@@ -113,8 +108,7 @@ ssize_t Socket::Write(const std::vector<char>& vector) {
 int Socket::get_fd() const { return _fd; }
 
 void Socket::Close() {
-  if (_fd != -1)
-    ::close(_fd);
+  if (_fd != -1) ::close(_fd);
 }
 
 Socket::~Socket() { Close(); }
@@ -152,7 +146,8 @@ bool Socket::operator<(const Socket& other) { return _reads < other._reads; }
 std::uint64_t Socket::getReads() const { return _reads; }
 bool Socket::getConnection() const { return _connection; }
 
-template <class T> T Socket::Read(std::size_t size) {
+template <class T>
+T Socket::Read(std::size_t size) {
   T result;
 
   try {
@@ -177,19 +172,18 @@ template <class T> T Socket::Read(std::size_t size) {
       result.resize(available);
       ssize_t readBytes = ::read(_fd, &result.front(), available);
       if (available != readBytes)
-        throw std::runtime_error("Socket read error on fd = " +
-                                 std::to_string(_fd) + "."
-                                                       "Expected to read " +
-                                 std::to_string(available) +
-                                 " bytes, but could only read " +
-                                 std::to_string(readBytes) + " bytes");
+        throw std::runtime_error(
+            "Socket read error on fd = " + std::to_string(_fd) +
+            "."
+            "Expected to read " +
+            std::to_string(available) + " bytes, but could only read " +
+            std::to_string(readBytes) + " bytes");
       ++_reads;
       return result;
     } else {
       result.resize(size);
       auto readBytes = ::read(_fd, &result.front(), size);
-      if(readBytes == 0)
-          throw connection_closed_by_peer {};
+      if (readBytes == 0) throw connection_closed_by_peer{};
       if (readBytes == -1) {
         if (!(((errno == EAGAIN) || (errno == EWOULDBLOCK)) && _blocking))
           throw std::runtime_error("Error when reading from socket, errno = " +
@@ -217,8 +211,7 @@ std::string Socket::ReadUntil(const std::string& until, bool peek) {
   do {
     result.resize(sum + buffSize);
     auto bytesRead = ::recv(_fd, &result.front(), buffSize + sum, MSG_PEEK);
-    if(bytesRead == 0)
-        throw connection_closed_by_peer{};
+    if (bytesRead == 0) throw connection_closed_by_peer{};
     if (bytesRead == -1) {
       if (!(((errno == EAGAIN) || (errno == EWOULDBLOCK)) && _blocking))
         throw std::runtime_error("Error when reading from socket, errno = " +
@@ -230,9 +223,8 @@ std::string Socket::ReadUntil(const std::string& until, bool peek) {
     if (position != std::string::npos) {
       position += until.size();
       try {
-        if (peek)
-          return result.substr(0, position);
-        return Read<std::string>(position); // result.substr(0, position);
+        if (peek) return result.substr(0, position);
+        return Read<std::string>(position);  // result.substr(0, position);
       } catch (std::runtime_error& ex) {
         throw;
       }

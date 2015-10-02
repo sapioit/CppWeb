@@ -18,8 +18,7 @@ Resource::Resource(const std::string& path) : _path(path) {
   try {
     _content = IO::FileSystem::ReadFile(path);
     auto stat_res = ::stat(_path.c_str(), &_stat);
-    if (stat_res != 0)
-      throw IO::fs_error("Could not stat " + path);
+    if (stat_res != 0) throw IO::fs_error("Could not stat " + path);
   } catch (IO::fs_error& ex) {
     throw;
   }

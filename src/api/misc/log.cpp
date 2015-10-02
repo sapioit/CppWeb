@@ -14,8 +14,7 @@ void Log::i(const std::string& text) {
   if (_loggingEnabled) {
     volatile std::lock_guard<std::mutex> lock(mLock);
     std::fstream stream(_fn, std::ios::out | std::ios::app);
-    if (stream.is_open() == false)
-      return;
+    if (stream.is_open() == false) return;
     stream << getTimeStamp() << " Info  : " << text << std::endl;
   }
 }
@@ -24,8 +23,7 @@ void Log::e(const std::string& text) {
   if (_loggingEnabled) {
     volatile std::lock_guard<std::mutex> lock(mLock);
     std::fstream stream(_fn, std::ios::out | std::ios::app);
-    if (stream.is_open() == false)
-      return;
+    if (stream.is_open() == false) return;
     stream << getTimeStamp() << " Info  : " << text << std::endl;
   }
 }

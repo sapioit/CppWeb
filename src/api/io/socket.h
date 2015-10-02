@@ -16,7 +16,7 @@
 
 namespace IO {
 class Socket {
-public:
+ public:
   struct connection_closed_by_peer {};
   int get_fd() const;
   bool is_blocking() const;
@@ -33,7 +33,8 @@ public:
   std::shared_ptr<Socket> Accept();
   Socket(std::uint16_t fd);
 
-  template <class T> T Read(std::size_t size = 0);
+  template <class T>
+  T Read(std::size_t size = 0);
 
   std::string ReadUntil(const std::string& U, bool peek = false);
   ssize_t Write(const char*, std::size_t);
@@ -46,7 +47,7 @@ public:
 
   bool getConnection() const;
 
-private:
+ private:
   std::uint16_t _port;
   std::uint64_t _reads = 0;
   int _opt = 1;
@@ -57,4 +58,4 @@ private:
 };
 };
 
-#endif // SOCKET_SOCKET_H
+#endif  // SOCKET_SOCKET_H

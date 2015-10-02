@@ -120,4 +120,4 @@ struct Header {
 };
 }
 
-#endif // SOCKET_HEADER_H
+#endif  // SOCKET_HEADER_H

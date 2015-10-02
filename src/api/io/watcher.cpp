@@ -57,8 +57,7 @@ void Watcher::RemoveSocket(std::shared_ptr<Socket> sock) {
 }
 
 Watcher::~Watcher() {
-  for (auto& event : _events)
-    ::close(event.data.fd);
+  for (auto& event : _events) ::close(event.data.fd);
 }
 bool Watcher::stopRequested() const { return _stopRequested; }
 

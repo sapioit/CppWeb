@@ -10,7 +10,7 @@ class Date {
   time_t _time;
   struct tm tm;
 
-public:
+ public:
   Date(time_t time) : _time(time), tm(*gmtime(&_time)) {}
 
   std::string operator()() {
@@ -28,4 +28,4 @@ public:
 };
 }
 
-#endif // DATE
+#endif  // DATE

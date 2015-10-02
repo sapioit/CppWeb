@@ -31,8 +31,7 @@ void Server::setSettings(const Settings& s) {
 }
 
 void Server::run() {
-  if (_port == -1)
-    throw std::runtime_error("Port number not set");
+  if (_port == -1) throw std::runtime_error("Port number not set");
   try {
     _masterSocket = IO::Socket::start_socket(_port, _maxPending);
     IO::Watcher _master_listener(_masterSocket, _maxPending);
@@ -48,8 +47,7 @@ void Server::run() {
             Log::i("Will dispatch " + std::to_string(sockets.size()) +
                    " connections");
             auto should_close = Dispatcher::Dispatch((*sock));
-            if (should_close)
-              _master_listener.RemoveSocket(sock);
+            if (should_close) _master_listener.RemoveSocket(sock);
           }
         });
 

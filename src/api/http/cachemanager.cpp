@@ -11,8 +11,7 @@ std::mutex CacheManager::_putLock;
 
 Resource CacheManager::GetItem(const std::string& path) {
   auto item = CacheManager::_resources.find(path);
-  if (item != CacheManager::_resources.end())
-    return item->second;
+  if (item != CacheManager::_resources.end()) return item->second;
 
   return {};
 }
