@@ -17,6 +17,7 @@
 namespace IO {
 class Socket {
 public:
+  struct connection_closed_by_peer {};
   int get_fd() const;
   bool is_blocking() const;
   Socket(int port, bool connection);

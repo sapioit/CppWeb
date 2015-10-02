@@ -188,6 +188,8 @@ template <class T> T Socket::Read(std::size_t size) {
     } else {
       result.resize(size);
       auto readBytes = ::read(_fd, &result.front(), size);
+      if(readBytes == 0)
+          throw connection_closed_by_peer {};
       if (readBytes == -1) {
         if (!(((errno == EAGAIN) || (errno == EWOULDBLOCK)) && _blocking))
           throw std::runtime_error("Error when reading from socket, errno = " +
@@ -215,6 +217,8 @@ std::string Socket::ReadUntil(const std::string& until, bool peek) {
   do {
     result.resize(sum + buffSize);
     auto bytesRead = ::recv(_fd, &result.front(), buffSize + sum, MSG_PEEK);
+    if(bytesRead == 0)
+        throw connection_closed_by_peer{};
     if (bytesRead == -1) {
       if (!(((errno == EAGAIN) || (errno == EWOULDBLOCK)) && _blocking))
         throw std::runtime_error("Error when reading from socket, errno = " +

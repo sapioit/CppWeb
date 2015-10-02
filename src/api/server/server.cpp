@@ -47,7 +47,7 @@ void Server::run() {
           for (auto& sock : sockets) {
             Log::i("Will dispatch " + std::to_string(sockets.size()) +
                    " connections");
-            bool should_close = Dispatcher::Dispatch((*sock));
+            auto should_close = Dispatcher::Dispatch((*sock));
             if (should_close)
               _master_listener.RemoveSocket(sock);
           }

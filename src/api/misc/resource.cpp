@@ -16,7 +16,7 @@ Resource::Resource(const std::string& path, const std::vector<char>& content,
 
 Resource::Resource(const std::string& path) : _path(path) {
   try {
-    _content = std::move(IO::FileSystem::ReadFile(path));
+    _content = IO::FileSystem::ReadFile(path);
     auto stat_res = ::stat(_path.c_str(), &_stat);
     if (stat_res != 0)
       throw IO::fs_error("Could not stat " + path);

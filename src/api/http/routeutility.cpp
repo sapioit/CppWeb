@@ -5,15 +5,19 @@
 
 std::function<Http::Response(Http::Request)> RouteUtility::GetHandler(
     const Http::Request& request,
-    const std::map<std::string, std::function<Http::Response(Http::Request)> >&
-        routes) {
+    const std::map<std::pair<Http::Components::Method, std::string>,
+                   std::function<Http::Response(Http::Request)>>& routes) {
   auto strippedRoute = Http::Parser::StripRoute(request.URI);
   auto result = std::find_if(
       routes.begin(), routes.end(),
-      [&](const std::pair<std::string,
-                          std::function<Http::Response(Http::Request)> >& route)
+      [&](const std::pair<std::pair<Http::Components::Method, std::string>,
+                          std::function<Http::Response(Http::Request)>>& route)
           -> bool {
-            std::regex regex(route.first);
+            auto& method = route.first.first;
+            if (request.method != method)
+              return false;
+            auto& pattern = route.first.second;
+            std::regex regex(pattern);
             return std::regex_match(strippedRoute, regex);
           });
 

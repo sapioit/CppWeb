@@ -11,7 +11,7 @@
 namespace Web {
 class Dispatcher {
 public:
-  static std::map<std::string, std::function<Http::Response(Http::Request)> >
+  static std::map<std::pair<Http::Components::Method, std::string>, std::function<Http::Response(Http::Request)> >
       routes;
   static bool Dispatch(IO::Socket& connection);
   static void PassToUser(
