@@ -1,7 +1,7 @@
 # Compiler
-CC = clang++
-OPTS = -fPIC -std=c++14 -O3 -g -Wall -D_REENTRANT -march=native
-DEBUGOPTS = 
+CXX = clang++
+OPTS = -fPIC -std=c++14 -O3 -Wall -D_REENTRANT
+DEBUGOPTS = -g
 INCLUDEDIRS = -I.
 
 # Project name
@@ -22,31 +22,31 @@ TOBJS	= main.o
 
 # Targets
 $(PROJECT): $(OBJS) $(TOBJS)
-	$(CC) $(OPTS) $(DEBUGOPTS) $(LIBS) $^ -o $@
+	$(CXX) $(OPTS) $(DEBUGOPTS) $(LIBS) $^ -o $@
 
 %.o : %.cpp
-	$(CC) -c $(OPTS) $(DEBUGOPTS) $(INCLUDEDIRS) $< -o $@
+	$(CXX) -c $(OPTS) $(DEBUGOPTS) $(INCLUDEDIRS) $< -o $@
 	
 %.o : http/%.cpp
-	$(CC) -c $(OPTS) $(DEBUGOPTS) $(INCLUDEDIRS) $< -o $@
+	$(CXX) -c $(OPTS) $(DEBUGOPTS) $(INCLUDEDIRS) $< -o $@
 
 %.o : io/%.cpp
-	$(CC) -c $(OPTS) $(DEBUGOPTS) $(INCLUDEDIRS) $< -o $@
+	$(CXX) -c $(OPTS) $(DEBUGOPTS) $(INCLUDEDIRS) $< -o $@
 	
 %.o : json/%.cpp
-	$(CC) -c $(OPTS) $(DEBUGOPTS) $(INCLUDEDIRS) $< -o $@
+	$(CXX) -c $(OPTS) $(DEBUGOPTS) $(INCLUDEDIRS) $< -o $@
 	
 %.o : misc/%.cpp
-	$(CC) -c $(OPTS) $(DEBUGOPTS) $(INCLUDEDIRS) $< -o $@
+	$(CXX) -c $(OPTS) $(DEBUGOPTS) $(INCLUDEDIRS) $< -o $@
 	
 %.o : server/%.cpp
-	$(CC) -c $(OPTS) $(DEBUGOPTS) $(INCLUDEDIRS) $< -o $@
+	$(CXX) -c $(OPTS) $(DEBUGOPTS) $(INCLUDEDIRS) $< -o $@
 
 clean:
 	rm *.o $(PROJECT) $(LIBNAME) -Rf
 
 lib: $(OBJS)
-	$(CC) $(OPTS) $(DEBUGOPTS) $(LIBS) $(LDFLAGS) $^ -o $(LIBNAME)
+	$(CXX) $(OPTS) $(DEBUGOPTS) $(LIBS) $(LDFLAGS) $^ -o $(LIBNAME)
 
 testapp: main.o
-	$(CC) $(OPTS) $(DEBUGOPTS) $(LIBS) -L./ $(LIBNAME_ABBREVIATED) $^ -o $(PROJECT)
+	$(CXX) $(OPTS) $(DEBUGOPTS) $(LIBS) -L./ $(LIBNAME_ABBREVIATED) $^ -o $(PROJECT)
