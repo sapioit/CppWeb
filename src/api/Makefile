@@ -10,15 +10,19 @@ PROJECT = srv
 # Libraries
 LIBS = -lpthread
 LDFLAGS = -shared
+LIBNAME = libcppweb.so
+LIBNAME_ABBREVIATED = -lcppweb
 
 # Files and folders
-OBJS    = main.o cachemanager.o parser.o request.o response.o responsemanager.o routeutility.o filesystem.o \
+#include main.o back
+OBJS    = cachemanager.o parser.o request.o response.o responsemanager.o routeutility.o filesystem.o \
 	outputscheduler.o socket.o watcher.o jsoncpp.o dfa.o log.o resource.o settings.o storage.o dispatcher.o \
 	server.o
+TOBJS	= main.o
 
 # Targets
 $(PROJECT): $(OBJS)
-	$(CC) $(OPTS) $(DEBUGOPTS) $(LIBS) $^ -o $@
+	$(CC) $(OPTS) $(DEBUGOPTS) $(LIBS) $(LDFLAGS) $^ -o $@
 
 %.o : %.cpp
 	$(CC) -c $(OPTS) $(DEBUGOPTS) $(INCLUDEDIRS) $< -o $@
@@ -41,5 +45,9 @@ $(PROJECT): $(OBJS)
 clean:
 	rm *.o $(PROJECT) -Rf
 
-lib:
-	$(CC) $(OBJS) $(LIBS) $(LDFLAGS) -o $(LIBNAME).so
+lib: $(OBJS)
+	$(CC) $(OPTS) $(DEBUGOPTS) $(LIBS) $(LDFLAGS) $^ -o $(LIBNAME)
+
+testapp: main.o
+	$(CC) $(OPTS) $(DEBUGOPTS) $(LIBS) -L./ $(LIBNAME_ABBREVIATED) $^ -o $(PROJECT)
+	
