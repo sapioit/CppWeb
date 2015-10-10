@@ -21,8 +21,8 @@ OBJS    = cachemanager.o parser.o request.o response.o responsemanager.o routeut
 TOBJS	= main.o
 
 # Targets
-$(PROJECT): $(OBJS)
-	$(CC) $(OPTS) $(DEBUGOPTS) $(LIBS) $(LDFLAGS) $^ -o $@
+$(PROJECT): $(OBJS) $(TOBJS)
+	$(CC) $(OPTS) $(DEBUGOPTS) $(LIBS) $^ -o $@
 
 %.o : %.cpp
 	$(CC) -c $(OPTS) $(DEBUGOPTS) $(INCLUDEDIRS) $< -o $@
@@ -43,11 +43,10 @@ $(PROJECT): $(OBJS)
 	$(CC) -c $(OPTS) $(DEBUGOPTS) $(INCLUDEDIRS) $< -o $@
 
 clean:
-	rm *.o $(PROJECT) -Rf
+	rm *.o $(PROJECT) $(LIBNAME) -Rf
 
 lib: $(OBJS)
 	$(CC) $(OPTS) $(DEBUGOPTS) $(LIBS) $(LDFLAGS) $^ -o $(LIBNAME)
 
 testapp: main.o
 	$(CC) $(OPTS) $(DEBUGOPTS) $(LIBS) -L./ $(LIBNAME_ABBREVIATED) $^ -o $(PROJECT)
-	
