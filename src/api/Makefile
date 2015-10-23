@@ -50,3 +50,6 @@ lib: $(OBJS)
 
 testapp: main.o
 	$(CXX) $(OPTS) $(DEBUGOPTS) $(LIBS) -L./ $(LIBNAME_ABBREVIATED) $^ -o $(PROJECT)
+
+install: 
+	cp $(LIBNAME) /usr/lib
