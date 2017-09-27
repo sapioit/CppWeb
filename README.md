@@ -1,4 +1,4 @@
-# CppWeb
+# CppWeb [![No Maintenance Intended](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/)
 HTTP proof-of-concept server written in C++
 (under development)
 
